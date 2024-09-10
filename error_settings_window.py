@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import logging
 import traceback
+from logging.handlers import RotatingFileHandler
+import os
 
 class ErrorSettingsWindow(tk.Toplevel):
     def __init__(self, parent, settings):
@@ -102,5 +104,23 @@ class ErrorSettingsWindow(tk.Toplevel):
             logging.error(f"Error saving settings in ErrorSettingsWindow: {str(e)}")
             logging.error(traceback.format_exc())
             messagebox.showerror("오류", f"설정 저장 중 오류 발생: {str(e)}")
+def setup_logging():
+    log_dir = 'logs'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    
+    log_file = os.path.join(log_dir, 'error_settings.log')
+    
+    file_handler = RotatingFileHandler(log_file, maxBytes=1024 * 1024, backupCount=5)
+    file_handler.setLevel(logging.DEBUG)
+    
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[file_handler, console_handler]
+    )
 
-logging.basicConfig(level=logging.DEBUG)
+setup_logging()
