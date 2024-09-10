@@ -109,7 +109,7 @@ def setup_logging():
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     
-    log_file = os.path.join(log_dir, 'error_settings.log')
+    log_file = os.path.join(log_dir, 'srt_checker.log')
     
     file_handler = RotatingFileHandler(log_file, maxBytes=1024 * 1024, backupCount=5)
     file_handler.setLevel(logging.DEBUG)
