@@ -3,7 +3,10 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import logging
 from settings_manager import SettingsManager
+from error_settings_window import ErrorSettingsWindow
+from srt_processor import process_folder
 import sys
+import traceback
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -58,25 +61,39 @@ class Application(tk.Frame):
         self.results_tree.bind("<Double-1>", self.on_double_click)
 
     def save_settings(self):
-        self.settings_manager.update_settings(self.settings)
-        logging.debug(f"Settings saved: {self.settings}")
-
-    def open_settings(self):
-        settings_copy = json.loads(json.dumps(self.settings))
-        ErrorSettingsWindow(self, settings_copy)
+        try:
+            logging.debug("Saving settings")
+            self.settings_manager.update_settings(self.settings)
+            logging.debug(f"Settings saved: {self.settings}")
+        except Exception as e:
+            logging.error(f"Error in save_settings: {str(e)}")
+            logging.error(traceback.format_exc())
+            messagebox.showerror("오류", f"설정 저장 중 오류 발생: {str(e)}")
 
     def select_folder(self):
-        folder_path = filedialog.askdirectory()
-        if folder_path:
-            logging.debug(f"Selected folder: {folder_path}")
-            logging.debug(f"Current settings: {self.settings}")
-            results = process_folder(folder_path, self.settings)
-            logging.debug(f"Processing results: {results}")
-            if results:
+        try:
+            logging.debug("Folder selection initiated")
+            folder_path = filedialog.askdirectory()
+            if folder_path:
+                logging.debug(f"Selected folder: {folder_path}")
+                results = process_folder(folder_path, self.settings)
+                logging.debug(f"Processing results: {results}")
                 self.display_results(results)
             else:
-                logging.warning("No results to display")
-                messagebox.showinfo("정보", "선택한 폴더에서 오류를 발견하지 못했습니다.")
+                logging.debug("No folder selected")
+        except Exception as e:
+            logging.error(f"Error in select_folder: {str(e)}")
+            logging.error(traceback.format_exc())
+            messagebox.showerror("오류", f"폴더 선택 중 오류 발생: {str(e)}")
+
+    def open_settings(self):
+        try:
+            logging.debug("Opening settings window")
+            ErrorSettingsWindow(self, self.settings)
+        except Exception as e:
+            logging.error(f"Error in open_settings: {str(e)}")
+            logging.error(traceback.format_exc())
+            messagebox.showerror("오류", f"설정 창 열기 중 오류 발생: {str(e)}")
 
     def display_results(self, results):
         logging.debug("Displaying results")
@@ -121,3 +138,6 @@ class Application(tk.Frame):
         # text_widget.configure(yscrollcommand=scrollbar.set)
         text_widget.insert(tk.END, text)
         text_widget.config(state=tk.DISABLED)
+
+logging.basicConfig(filename='srt_checker.log', level=logging.DEBUG, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')

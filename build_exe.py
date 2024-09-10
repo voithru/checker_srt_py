@@ -19,6 +19,7 @@ PyInstaller.__main__.run([
     '--hidden-import', 'tkinter.ttk',
     '--hidden-import', 'tkinter.filedialog',
     '--hidden-import', 'tkinter.messagebox',
+    '--add-data', f'{current_dir}\\srt_checker.log;.',
     '--clean',
     '--log-level', 'DEBUG'
 ])
