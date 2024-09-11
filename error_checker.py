@@ -2,6 +2,8 @@ import unicodedata
 import logging
 import re
 
+logger = logging.getLogger('SRTChecker')
+
 def count_cjk_characters(text):
     count = 0
     for char in text:
@@ -24,11 +26,11 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_line_count(srt_file, lang_code, file_name))
             elif error_check['name'] == "???여부":
                 errors.extend(check_question_marks(srt_file, lang_code, file_name))
-            elif error_check['name'] == "중간 말줄임표 여부":
+            elif error_check['name'] == "중간 말줄임표":
                 errors.extend(check_ellipsis(srt_file, lang_code, file_name))
-            elif error_check['name'] == "온점 말줄임표 여부":
+            elif error_check['name'] == "온점 말줄임표":
                 errors.extend(check_dot_ellipsis(srt_file, lang_code, file_name))
-            elif error_check['name'] == "줄 끝 마침표 여부":
+            elif error_check['name'] == "줄 끝 마침표":
                 errors.extend(check_end_punctuation(srt_file, lang_code, file_name))
             elif error_check['name'] == "하이픈 뒤 공백O":
                 errors.extend(check_hyphen_space(srt_file, lang_code, file_name, True))
@@ -109,7 +111,7 @@ def check_ellipsis(srt_file, lang_code, file_name):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
-                    "ErrorType": "중간 말줄임표 여부",
+                    "ErrorType": "중간 말줄임표",
                     "ErrorContent": f"{line_num}번째 줄",
                     "SubtitleText": sub.text
                 }
@@ -129,7 +131,7 @@ def check_dot_ellipsis(srt_file, lang_code, file_name):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
-                    "ErrorType": "온점 말줄임표 여부",
+                    "ErrorType": "온점 말줄임표",
                     "ErrorContent": f"{line_num}번째 줄",
                     "SubtitleText": sub.text
                 }
@@ -150,7 +152,7 @@ def check_end_punctuation(srt_file, lang_code, file_name):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
-                    "ErrorType": "줄 끝 마침표 여부",
+                    "ErrorType": "줄 끝 마침표",
                     "ErrorContent": f"{line_num}번째 줄",
                     "SubtitleText": sub.text
                 }
@@ -167,17 +169,6 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
         for line_num, line in enumerate(lines, 1):
             if line.strip().startswith('-'):
                 if space_expected:
-                    if not line.strip().startswith('- '):
-                        error = {
-                            "File": file_name,
-                            "StartTC": str(sub.start),
-                            "ErrorType": error_type,
-                            "ErrorContent": f"{line_num}번째 줄",
-                            "SubtitleText": sub.text
-                        }
-                        errors.append(error)
-                        logging.debug(f"Hyphen space error in {file_name}: {error}")
-                else:
                     if line.strip().startswith('- '):
                         error = {
                             "File": file_name,
@@ -187,7 +178,18 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
                             "SubtitleText": sub.text
                         }
                         errors.append(error)
-                        logging.debug(f"Hyphen space error in {file_name}: {error}")
+                        logger.debug(f"Hyphen space error in {file_name}: {error}")
+                else:
+                    if not line.strip().startswith('- '):
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": error_type,
+                            "ErrorContent": f"{line_num}번째 줄",
+                            "SubtitleText": sub.text
+                        }
+                        errors.append(error)
+                        logger.debug(f"Hyphen space error in {file_name}: {error}")
     return errors
 
 logging.basicConfig(level=logging.DEBUG)

@@ -18,11 +18,11 @@ class SettingsManager:
                 {"name": "줄당 자수", "languages": default_languages.copy()},
                 {"name": "줄 수", "languages": default_languages.copy()},
                 {"name": "???여부", "languages": default_languages.copy()},
-                {"name": "중간 말줄임표 여부", "languages": {"KOR": True, "ENG": False, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
-                {"name": "온점 말줄임표 여부", "languages": {"KOR": False, "ENG": True, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}},
-                {"name": "줄 끝 마침표 여부", "languages": {"KOR": True, "ENG": True, "JPN": True, "CHN": True, "SPA": False, "VIE": True, "IND": True, "THA": True}},
+                {"name": "중간 말줄임표", "languages": {"KOR": True, "ENG": False, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
+                {"name": "온점 말줄임표", "languages": {"KOR": False, "ENG": True, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}},
+                {"name": "줄 끝 마침표", "languages": {"KOR": True, "ENG": True, "JPN": True, "CHN": True, "SPA": False, "VIE": True, "IND": True, "THA": True}},
                 {"name": "하이픈 뒤 공백O", "languages": {"KOR": False, "ENG": True, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
-                {"name": "하이픈 뒤 공백X", "languages": {"KOR": True, "ENG": False, "JPN": True, "CHN": True, "SPA": False, "VIE": True, "IND": True, "THA": True}}
+                {"name": "하이픈 뒤 공백X", "languages": {"KOR": True, "ENG": False, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}}
             ]
         }
         

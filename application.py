@@ -2,11 +2,45 @@ import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import logging
+from logging.handlers import RotatingFileHandler
 from settings_manager import SettingsManager
 from error_settings_window import ErrorSettingsWindow
 from srt_processor import process_folder
 import sys
 import traceback
+from datetime import datetime
+
+# 로그 설정
+log_folder = 'logs'
+if not os.path.exists(log_folder):
+    os.makedirs(log_folder)
+
+current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_file = os.path.join(log_folder, f'srt_checker_{current_time}.log')
+
+# 로거 생성
+logger = logging.getLogger('SRTChecker')
+logger.setLevel(logging.DEBUG)
+
+# 파일 핸들러 설정 (최대 5MB, 최대 5개 백업 파일)
+file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=5)
+file_handler.setLevel(logging.DEBUG)
+
+# 콘솔 핸들러 설정
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.DEBUG)
+
+# 포맷터 설정
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# 핸들러 추가
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+# 시작 로그 메시지
+logger.info("Application started")
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -27,6 +61,7 @@ class Application(tk.Frame):
         logging.debug(f"Initialized settings: {self.settings}")
         
         self.create_widgets()
+        logging.info("Application initialized")
 
     def create_widgets(self):
         self.grid_columnconfigure(0, weight=1)
@@ -155,6 +190,9 @@ class Application(tk.Frame):
         # text_widget.configure(yscrollcommand=scrollbar.set)
         text_widget.insert(tk.END, text)
         text_widget.config(state=tk.DISABLED)
+    def on_closing(self):
+        logger.info("Application closing")
+        self.master.destroy()
 
 logging.basicConfig(filename='srt_checker.log', level=logging.DEBUG, 
                     format='%(asctime)s - %(levelname)s - %(message)s')

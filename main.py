@@ -13,6 +13,7 @@ sys.path.append(application_path)
 def main():
     root = tk.Tk()
     app = Application(master=root)
+    root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
 
 if __name__ == "__main__":
