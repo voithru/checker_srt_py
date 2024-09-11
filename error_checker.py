@@ -165,27 +165,29 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
     for sub in srt_file:
         lines = sub.text.split('\n')
         for line_num, line in enumerate(lines, 1):
-            if line.startswith('-'):
-                if space_expected and not line.startswith('- '):
-                    error = {
-                        "File": file_name,
-                        "StartTC": str(sub.start),
-                        "ErrorType": error_type,
-                        "ErrorContent": f"{line_num}번째 줄",
-                        "SubtitleText": sub.text
-                    }
-                    errors.append(error)
-                    logging.debug(f"Hyphen space error in {file_name}: {error}")
-                elif not space_expected and line.startswith('- '):
-                    error = {
-                        "File": file_name,
-                        "StartTC": str(sub.start),
-                        "ErrorType": error_type,
-                        "ErrorContent": f"{line_num}번째 줄",
-                        "SubtitleText": sub.text
-                    }
-                    errors.append(error)
-                    logging.debug(f"Hyphen space error in {file_name}: {error}")
+            if line.strip().startswith('-'):
+                if space_expected:
+                    if not line.strip().startswith('- '):
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": error_type,
+                            "ErrorContent": f"{line_num}번째 줄",
+                            "SubtitleText": sub.text
+                        }
+                        errors.append(error)
+                        logging.debug(f"Hyphen space error in {file_name}: {error}")
+                else:
+                    if line.strip().startswith('- '):
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": error_type,
+                            "ErrorContent": f"{line_num}번째 줄",
+                            "SubtitleText": sub.text
+                        }
+                        errors.append(error)
+                        logging.debug(f"Hyphen space error in {file_name}: {error}")
     return errors
 
 logging.basicConfig(level=logging.DEBUG)
