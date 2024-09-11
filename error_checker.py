@@ -28,6 +28,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_ellipsis(srt_file, lang_code, file_name))
             elif error_check['name'] == "온점 말줄임표 여부":
                 errors.extend(check_dot_ellipsis(srt_file, lang_code, file_name))
+            elif error_check['name'] == "줄 끝 마침표 여부":
+                errors.extend(check_end_punctuation(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -129,6 +131,28 @@ def check_dot_ellipsis(srt_file, lang_code, file_name):
                 }
                 errors.append(error)
                 logging.debug(f"Incorrect ellipsis found in {file_name}: {error}")
+    return errors
+
+def check_end_punctuation(srt_file, lang_code, file_name):
+    errors = []
+    
+    # 일본어와 중국어는 '。'를, 그 외 언어는 '.'를 사용
+    end_punct = '。' if lang_code in ['JPN', 'CHN'] else '.'
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            line = line.strip()  # 앞뒤 공백 제거
+            if line and not line.endswith(end_punct):
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "줄 끝 마침표 여부",
+                    "ErrorContent": f"{line_num}번째 줄",
+                    "SubtitleText": sub.text
+                }
+                errors.append(error)
+                logging.debug(f"Missing end punctuation in {file_name}: {error}")
     return errors
 
 logging.basicConfig(level=logging.DEBUG)

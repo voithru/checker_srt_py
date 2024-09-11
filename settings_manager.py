@@ -19,7 +19,8 @@ class SettingsManager:
                 {"name": "줄 수", "languages": default_languages.copy()},
                 {"name": "???여부", "languages": default_languages.copy()},
                 {"name": "중간 말줄임표 여부", "languages": {"KOR": True, "ENG": False, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
-                {"name": "온점 말줄임표 여부", "languages": {"KOR": False, "ENG": True, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}}
+                {"name": "온점 말줄임표 여부", "languages": {"KOR": False, "ENG": True, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}},
+                {"name": "줄 끝 마침표 여부", "languages": {"KOR": True, "ENG": True, "JPN": True, "CHN": True, "SPA": False, "VIE": True, "IND": True, "THA": True}}
             ]
         }
         
