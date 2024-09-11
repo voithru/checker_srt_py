@@ -96,10 +96,6 @@ class ErrorSettingsWindow(tk.Toplevel):
             self.parent.save_settings()
             self.destroy()  # 창 닫기
             messagebox.showinfo("알림", "설정이 저장되었습니다.")
-            self.parent.settings = self.settings
-            self.parent.save_settings()
-            self.destroy()
-            logging.debug("Settings saved and window closed")
         except Exception as e:
             logging.error(f"Error saving settings in ErrorSettingsWindow: {str(e)}")
             logging.error(traceback.format_exc())

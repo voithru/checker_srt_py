@@ -21,6 +21,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_line_length(srt_file, lang_code, file_name))
             elif error_check['name'] == "줄 수":
                 errors.extend(check_line_count(srt_file, lang_code, file_name))
+            elif error_check['name'] == "???여부":
+                errors.extend(check_question_marks(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -65,6 +67,24 @@ def check_line_count(srt_file, lang_code, file_name):
             }
             errors.append(error)
             logging.debug(f"Line count error in {file_name}: {error}")
+    return errors
+
+def check_question_marks(srt_file, lang_code, file_name):
+    errors = []
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if '???' in line:
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "???여부",
+                    "ErrorContent": f"{line_num}번째 줄",
+                    "SubtitleText": sub.text
+                }
+                errors.append(error)
+                logging.debug(f"??? found in {file_name}: {error}")
     return errors
 
 logging.basicConfig(level=logging.DEBUG)

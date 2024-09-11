@@ -16,7 +16,8 @@ class SettingsManager:
         default_settings = {
             "errors": [
                 {"name": "줄당 자수", "languages": default_languages.copy()},
-                {"name": "줄 수", "languages": default_languages.copy()}
+                {"name": "줄 수", "languages": default_languages.copy()},
+                {"name": "???여부", "languages": default_languages.copy()}
             ]
         }
         
