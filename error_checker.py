@@ -143,7 +143,7 @@ def check_end_punctuation(srt_file, lang_code, file_name):
         lines = sub.text.split('\n')
         for line_num, line in enumerate(lines, 1):
             line = line.strip()  # 앞뒤 공백 제거
-            if line and not line.endswith(end_punct):
+            if line and line.endswith(end_punct):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
