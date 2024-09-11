@@ -79,7 +79,7 @@ def check_line_count(srt_file, lang_code, file_name):
                 "SubtitleText": sub.text
             }
             errors.append(error)
-            logging.debug(f"Line count error in {file_name}: {error}")
+            # logging.debug(f"Line count error in {file_name}: {error}")
     return errors
 
 def check_question_marks(srt_file, lang_code, file_name):
@@ -97,7 +97,7 @@ def check_question_marks(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
-                logging.debug(f"??? found in {file_name}: {error}")
+                # logging.debug(f"??? found in {file_name}: {error}")
     return errors
 
 def check_ellipsis(srt_file, lang_code, file_name):
@@ -116,7 +116,7 @@ def check_ellipsis(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
-                logging.debug(f"Incorrect ellipsis found in {file_name}: {error}")
+                # logging.debug(f"Incorrect ellipsis found in {file_name}: {error}")
     return errors
 
 
@@ -136,7 +136,7 @@ def check_dot_ellipsis(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
-                logging.debug(f"Incorrect ellipsis found in {file_name}: {error}")
+                # logging.debug(f"Incorrect ellipsis found in {file_name}: {error}")
     return errors
 
 def check_end_punctuation(srt_file, lang_code, file_name):
@@ -157,7 +157,7 @@ def check_end_punctuation(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
-                logging.debug(f"Missing end punctuation in {file_name}: {error}")
+                # logging.debug(f"Missing end punctuation in {file_name}: {error}")
     return errors
 
 def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
@@ -178,7 +178,7 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
                             "SubtitleText": sub.text
                         }
                         errors.append(error)
-                        logger.debug(f"Hyphen space error in {file_name}: {error}")
+                        # logger.debug(f"Hyphen space error in {file_name}: {error}")
                 else:
                     if not line.strip().startswith('- '):
                         error = {
@@ -189,7 +189,7 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
                             "SubtitleText": sub.text
                         }
                         errors.append(error)
-                        logger.debug(f"Hyphen space error in {file_name}: {error}")
+                        # logger.debug(f"Hyphen space error in {file_name}: {error}")
     return errors
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
