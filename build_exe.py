@@ -12,7 +12,6 @@ PyInstaller.__main__.run([
     '--add-data', f'{current_dir}\\error_checker.py;.',
     '--add-data', f'{current_dir}\\srt_processor.py;.',
     '--add-data', f'{current_dir}\\error_settings_window.py;.',
-    '--add-data', f'{current_dir}\\icon.ico;.',
     '--add-data', f'{current_dir}\\application.py;.',
     '--hidden-import', 'win32api',
     '--hidden-import', 'win32con',

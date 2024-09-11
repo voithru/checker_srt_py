@@ -56,10 +56,6 @@ class Application(tk.Frame):
         else:
             application_path = os.path.dirname(os.path.abspath(__file__))
         self.settings_file = os.path.join(application_path, "srt_checker_settings.json")
-        
-        icon_path = os.path.join(application_path, "icon.ico")
-        if os.path.exists(icon_path):
-            self.master.iconbitmap(icon_path)
             
         self.settings_manager = SettingsManager(self.settings_file)
         self.settings = self.settings_manager.get_settings()
