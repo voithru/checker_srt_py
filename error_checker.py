@@ -164,7 +164,7 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
     
     for sub in srt_file:
         lines = sub.text.split('\n')
-        for line_num, line in enumerate(lines, 1):
+        for line, line_num in enumerate(lines, 1):
             if line.startswith('-'):
                 if space_expected and not line.startswith('- '):
                     error = {
