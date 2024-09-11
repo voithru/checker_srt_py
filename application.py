@@ -29,8 +29,11 @@ class Application(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+
         button_frame = ttk.Frame(self)
-        button_frame.pack(pady=10, padx=10, fill=tk.X)
+        button_frame.grid(row=0, column=0, pady=10, padx=10, sticky="ew")
 
         self.select_folder_button = ttk.Button(button_frame, text="폴더 선택", command=self.select_folder)
         self.select_folder_button.pack(side=tk.LEFT)
@@ -40,9 +43,12 @@ class Application(tk.Frame):
 
         # 트리뷰와 스크롤바를 포함할 프레임 생성
         tree_frame = ttk.Frame(self)
-        tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        tree_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        tree_frame.grid_columnconfigure(0, weight=1)
+        tree_frame.grid_rowconfigure(0, weight=1)
 
-        self.results_tree = ttk.Treeview(self)
+        # 트리뷰 생성
+        self.results_tree = ttk.Treeview(tree_frame)
         self.results_tree["columns"] = ("File", "StartTC", "ErrorType", "ErrorContent", "SubtitleText")
         self.results_tree.column("#0", width=100, stretch=tk.NO)
         self.results_tree.column("File", width=150, anchor=tk.W)
@@ -56,14 +62,18 @@ class Application(tk.Frame):
         self.results_tree.heading("ErrorType", text="Error Type")
         self.results_tree.heading("ErrorContent", text="Error Content")
         self.results_tree.heading("SubtitleText", text="Subtitle Text")
-        self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.results_tree.grid(row=0, column=0, sticky="nsew")
 
         # 수직 스크롤바 추가
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.results_tree.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        # 수평 스크롤바 추가
+        h_scrollbar = ttk.Scrollbar(tree_frame, orient="horizontal", command=self.results_tree.xview)
+        h_scrollbar.grid(row=1, column=0, sticky="ew")
 
         # 트리뷰와 스크롤바 연결
-        self.results_tree.configure(yscrollcommand=scrollbar.set)
+        self.results_tree.configure(yscrollcommand=scrollbar.set, xscrollcommand=h_scrollbar.set)
 
         self.results_tree.bind("<Double-1>", self.on_double_click)
 
