@@ -17,11 +17,11 @@ class Application(tk.Frame):
         
         # 설정 파일 경로 설정
         if getattr(sys, 'frozen', False):
-            application_path = sys._MEIPASS
+            application_path = os.path.dirname(sys.executable)
         else:
             application_path = os.path.dirname(os.path.abspath(__file__))
         self.settings_file = os.path.join(application_path, "srt_checker_settings.json")
-        
+            
         self.settings_manager = SettingsManager(self.settings_file)
         self.settings = self.settings_manager.get_settings()
         logging.debug(f"Initialized settings: {self.settings}")
