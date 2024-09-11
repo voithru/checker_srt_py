@@ -136,14 +136,13 @@ def check_dot_ellipsis(srt_file, lang_code, file_name):
 def check_end_punctuation(srt_file, lang_code, file_name):
     errors = []
     
-    # 일본어와 중국어는 '。'를, 그 외 언어는 '.'를 사용
-    end_punct = '。' if lang_code in ['JPN', 'CHN'] else '.'
+    end_puncts = ['.'] if lang_code not in ['JPN', 'CHN'] else ['。', '.']
     
     for sub in srt_file:
         lines = sub.text.split('\n')
         for line_num, line in enumerate(lines, 1):
             line = line.strip()  # 앞뒤 공백 제거
-            if line and line.endswith(end_punct):
+            if line and any(line.endswith(punct) for punct in end_puncts):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
