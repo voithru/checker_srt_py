@@ -38,6 +38,10 @@ class Application(tk.Frame):
         self.settings_button = ttk.Button(button_frame, text="에러 설정", command=self.open_settings)
         self.settings_button.pack(side=tk.LEFT, padx=5)
 
+        # 트리뷰와 스크롤바를 포함할 프레임 생성
+        tree_frame = ttk.Frame(self)
+        tree_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
         self.results_tree = ttk.Treeview(self)
         self.results_tree["columns"] = ("File", "StartTC", "ErrorType", "ErrorContent", "SubtitleText")
         self.results_tree.column("#0", width=100, stretch=tk.NO)
@@ -52,11 +56,14 @@ class Application(tk.Frame):
         self.results_tree.heading("ErrorType", text="Error Type")
         self.results_tree.heading("ErrorContent", text="Error Content")
         self.results_tree.heading("SubtitleText", text="Subtitle Text")
-        self.results_tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # self.scrollbar_y = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.results_tree.yview)
-        # self.scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.results_tree.configure(yscrollcommand=self.scrollbar_y.set)
+        # 수직 스크롤바 추가
+        scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.results_tree.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # 트리뷰와 스크롤바 연결
+        self.results_tree.configure(yscrollcommand=scrollbar.set)
 
         self.results_tree.bind("<Double-1>", self.on_double_click)
 
