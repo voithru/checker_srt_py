@@ -48,6 +48,7 @@ class Application(tk.Frame):
         self.master = master
         self.master.title("SRT Checker")
         self.pack(fill=tk.BOTH, expand=True)
+        self.results = None  # 결과를 저장할 변수 추가
         
         # 설정 파일 경로 설정
         if getattr(sys, 'frozen', False):
@@ -75,6 +76,10 @@ class Application(tk.Frame):
 
         self.settings_button = ttk.Button(button_frame, text="에러 설정", command=self.open_settings)
         self.settings_button.pack(side=tk.LEFT, padx=5)
+
+        self.save_results_button = ttk.Button(button_frame, text="결과 저장", command=self.save_results_to_file)
+        self.save_results_button.pack(side=tk.LEFT, padx=5)
+        self.save_results_button.config(state=tk.DISABLED)  # 초기에는 비활성화
 
         # 트리뷰와 스크롤바를 포함할 프레임 생성
         tree_frame = ttk.Frame(self)
@@ -128,9 +133,10 @@ class Application(tk.Frame):
             folder_path = filedialog.askdirectory()
             if folder_path:
                 logging.debug(f"Selected folder: {folder_path}")
-                results = process_folder(folder_path, self.settings)
-                logging.debug(f"Processing results: {results}")
-                self.display_results(results)
+                self.results = process_folder(folder_path, self.settings)  # 결과 저장
+                logging.debug(f"Processing results: {self.results}")
+                self.display_results(self.results)
+                self.save_results_button.config(state=tk.NORMAL)  # 결과가 있으면 버튼 활성화
             else:
                 logging.debug("No folder selected")
         except Exception as e:
@@ -190,9 +196,44 @@ class Application(tk.Frame):
         # text_widget.configure(yscrollcommand=scrollbar.set)
         text_widget.insert(tk.END, text)
         text_widget.config(state=tk.DISABLED)
+    def save_results_to_file(self):
+        if not self.results:
+            messagebox.showinfo("알림", "저장할 결과가 없습니다.")
+            return
+
+        try:
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                                     filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+            if not file_path:
+                return
+
+            with open(file_path, 'w', encoding='utf-8') as f:
+                for lang, lang_results in self.results.items():
+                    f.write(f"Language: {lang}\n")
+                    f.write("-" * 50 + "\n")
+                    for error in lang_results:
+                        if isinstance(error, dict):
+                            f.write(f"File: {error['File']}\n")
+                            f.write(f"Start TC: {error['StartTC']}\n")
+                            f.write(f"Error Type: {error['ErrorType']}\n")
+                            f.write(f"Error Content: {error['ErrorContent']}\n")
+                            f.write(f"Subtitle Text: {error['SubtitleText']}\n")
+                        elif isinstance(error, tuple):  # PARSE_ERROR 처리
+                            f.write(f"File: {error[0]}\n")
+                            f.write(f"Error: PARSE_ERROR\n")
+                            f.write(f"Details: {error[1]}\n")
+                        f.write("-" * 50 + "\n")
+
+            logger.info(f"Results saved to file: {file_path}")
+            messagebox.showinfo("알림", f"결과가 {file_path}에 저장되었습니다.")
+        except Exception as e:
+            logger.error(f"Error saving results to file: {str(e)}")
+            logger.error(traceback.format_exc())
+            messagebox.showerror("오류", f"결과 저장 중 오류 발생: {str(e)}")
     def on_closing(self):
         logger.info("Application closing")
         self.master.destroy()
+
 
 logging.basicConfig(filename='srt_checker.log', level=logging.DEBUG, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
