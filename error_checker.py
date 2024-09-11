@@ -66,7 +66,7 @@ def check_line_length(srt_file, lang_code, file_name):
 
 def check_line_count(srt_file, lang_code, file_name):
     errors = []
-    max_lines = 2  # 최대 줄 수를 2로 설정
+    max_lines = 3  # 최대 줄 수를 2로 설정
     
     for sub in srt_file:
         lines = sub.text.split('\n')
