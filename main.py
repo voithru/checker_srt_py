@@ -3,7 +3,6 @@ from application import Application
 import sys
 import os
 
-# 실행 파일의 디렉토리를 sys.path에 추가
 if getattr(sys, 'frozen', False):
     application_path = sys._MEIPASS
 else:

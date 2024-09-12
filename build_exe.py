@@ -9,8 +9,6 @@ PyInstaller.__main__.run([
     '--onefile',
     '--windowed',
     '--name', 'SRTChecker',
-    '--icon', icon_path,
-    f'--add-data={icon_path};.',
     '--add-data', f'{current_dir}\\settings_manager.py;.',
     '--add-data', f'{current_dir}\\error_checker.py;.',
     '--add-data', f'{current_dir}\\srt_processor.py;.',
@@ -20,8 +18,6 @@ PyInstaller.__main__.run([
     '--hidden-import', 'tkinter.ttk',
     '--hidden-import', 'tkinter.filedialog',
     '--hidden-import', 'tkinter.messagebox',
-    '--hidden-import', 'logging',
-    '--hidden-import', 'logging.handlers',
     '--clean',
     '--log-level', 'INFO'
 ])

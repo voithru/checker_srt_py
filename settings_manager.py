@@ -1,10 +1,5 @@
 import json
 import os
-import logging
-
-import logging
-import os
-import json
 
 class SettingsManager:
     def __init__(self, settings_file):
@@ -31,19 +26,15 @@ class SettingsManager:
             try:
                 with open(self.settings_file, 'r', encoding='utf-8') as f:
                     loaded_settings = json.load(f)
-                logging.debug(f"Loaded settings from file: {loaded_settings}")
                 return loaded_settings
             except json.JSONDecodeError:
-                logging.error(f"Failed to load settings from {self.settings_file}. Using default settings.")
                 return default_settings
         else:
-            logging.debug("Settings file not found. Using default settings.")
             return default_settings
 
     def save_settings(self):
         with open(self.settings_file, 'w', encoding='utf-8') as f:
             json.dump(self.settings, f, ensure_ascii=False, indent=2)
-        logging.debug(f"Saved settings: {self.settings}")
 
     def get_settings(self):
         return self.settings
@@ -51,4 +42,3 @@ class SettingsManager:
     def update_settings(self, new_settings):
         self.settings = new_settings
         self.save_settings()
-logging.basicConfig(level=logging.DEBUG)
