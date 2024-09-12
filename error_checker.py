@@ -36,6 +36,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_hyphen_space(srt_file, lang_code, file_name, True))
             elif error_check['name'] == "하이픈 뒤 공백X":
                 errors.extend(check_hyphen_space(srt_file, lang_code, file_name, False))
+            elif error_check['name'] == "불필요한 공백":
+                errors.extend(check_space_errors(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -190,6 +192,43 @@ def check_hyphen_space(srt_file, lang_code, file_name, space_expected):
                         }
                         errors.append(error)
                         # logger.debug(f"Hyphen space error in {file_name}: {error}")
+    return errors
+
+def check_space_errors(srt_file, lang_code, file_name):
+    errors = []
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            # 줄 시작과 끝의 공백 체크
+            if line.strip() != line:
+                errors.append({
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "불필요한 공백",
+                    "ErrorContent": f"{line_num}번째 줄: 줄 시작/끝 공백",
+                    "SubtitleText": sub.text
+                })
+            
+            # 이중 공백 체크
+            if '  ' in line:
+                errors.append({
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "불필요한 공백",
+                    "ErrorContent": f"{line_num}번째 줄: 이중 공백",
+                    "SubtitleText": sub.text
+                })
+            
+            # 괄호 주변 공백 체크
+            if re.search(r'[\(\[\{]\s|\s[\)\]\}]', line):
+                errors.append({
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "불필요한 공백",
+                    "ErrorContent": f"{line_num}번째 줄: 괄호 안쪽 공백",
+                    "SubtitleText": sub.text
+                })
+    
     return errors
 
 # logging.basicConfig(level=logging.DEBUG)
