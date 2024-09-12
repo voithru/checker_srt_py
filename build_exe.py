@@ -2,7 +2,6 @@ import PyInstaller.__main__
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-icon_path = os.path.join(current_dir, 'icon.ico')
 
 PyInstaller.__main__.run([
     'main.py',
@@ -19,5 +18,4 @@ PyInstaller.__main__.run([
     '--hidden-import', 'tkinter.filedialog',
     '--hidden-import', 'tkinter.messagebox',
     '--clean',
-    '--log-level', 'INFO'
 ])
