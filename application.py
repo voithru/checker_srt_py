@@ -8,6 +8,8 @@ from error_settings_window import ErrorSettingsWindow
 from srt_processor import process_folder
 import sys
 import traceback
+import subprocess
+import platform
 from datetime import datetime
 
 # 로그 설정
@@ -49,6 +51,7 @@ class Application(tk.Frame):
         self.master.title("SRT Checker")
         self.pack(fill=tk.BOTH, expand=True)
         self.results = None  # 결과를 저장할 변수 추가
+        self.folder_path = None  # 선택된 폴더 경로를 저장할 변수 추가
         
         # 설정 파일 경로 설정
         if getattr(sys, 'frozen', False):
@@ -130,10 +133,10 @@ class Application(tk.Frame):
     def select_folder(self):
         try:
             logging.debug("Folder selection initiated")
-            folder_path = filedialog.askdirectory()
-            if folder_path:
-                logging.debug(f"Selected folder: {folder_path}")
-                self.results = process_folder(folder_path, self.settings)  # 결과 저장
+            self.folder_path = filedialog.askdirectory()
+            if self.folder_path:
+                logging.debug(f"Selected folder: {self.folder_path}")
+                self.results = process_folder(self.folder_path, self.settings)  # 결과 저장
                 logging.debug(f"Processing results: {self.results}")
                 self.display_results(self.results)
                 self.save_results_button.config(state=tk.NORMAL)  # 결과가 있으면 버튼 활성화
@@ -175,7 +178,10 @@ class Application(tk.Frame):
     def on_double_click(self, event):
         item = self.results_tree.selection()[0]
         column = self.results_tree.identify_column(event.x)
-        if column == '#5':  # SubtitleText 열
+        if column == '#1':  # File 열
+            file_name = self.results_tree.item(item, "values")[0]
+            self.open_file(file_name)
+        elif column == '#5':  # SubtitleText 열
             text = self.results_tree.item(item, "tags")[0]  # 원본 텍스트 (줄바꿈 포함)
             self.show_full_text(text)
 
@@ -193,9 +199,27 @@ class Application(tk.Frame):
         scrollbar = ttk.Scrollbar(text_frame, orient="vertical", command=text_widget.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        # text_widget.configure(yscrollcommand=scrollbar.set)
         text_widget.insert(tk.END, text)
         text_widget.config(state=tk.DISABLED)
+    
+    def open_file(self, file_name):
+        if self.folder_path:
+            full_path = os.path.join(self.folder_path, file_name)
+            if os.path.exists(full_path):
+                if platform.system() == 'Darwin':  # macOS
+                    subprocess.call(('open', full_path))
+                elif platform.system() == 'Windows':  # Windows
+                    os.startfile(full_path)
+                else:  # linux
+                    subprocess.call(('xdg-open', full_path))
+                logger.info(f"Opened file: {full_path}")
+            else:
+                messagebox.showerror("오류", f"파일을 찾을 수 없습니다: {full_path}")
+                logger.error(f"File not found: {full_path}")
+        else:
+            messagebox.showerror("오류", "폴더가 선택되지 않았습니다.")
+            logger.error("No folder selected when trying to open file")
+
     def save_results_to_file(self):
         if not self.results:
             messagebox.showinfo("알림", "저장할 결과가 없습니다.")
