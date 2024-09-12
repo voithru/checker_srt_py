@@ -1,7 +1,6 @@
 import PyInstaller.__main__
 import os
 import sys
-import pyperclip
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -13,9 +12,6 @@ else:  # macOS 및 Linux
     separator = ':'
     add_data_format = '{}:.'
 
-# pyperclip 모듈 경로 찾기
-pyperclip_path = os.path.dirname(pyperclip.__file__)
-
 PyInstaller.__main__.run([
     'main.py',
     '--onefile',
@@ -26,7 +22,6 @@ PyInstaller.__main__.run([
     '--add-data', add_data_format.format(os.path.join(current_dir, 'srt_processor.py')),
     '--add-data', add_data_format.format(os.path.join(current_dir, 'error_settings_window.py')),
     '--add-data', add_data_format.format(os.path.join(current_dir, 'application.py')),
-    '--add-data', add_data_format.format(os.path.join(pyperclip_path, '*')),
     '--hidden-import', 'tkinter',
     '--hidden-import', 'tkinter.ttk',
     '--hidden-import', 'tkinter.filedialog',
