@@ -10,6 +10,8 @@ import platform
 import pyperclip
 
 class Application(tk.Frame):
+    LANGUAGE_ORDER = ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']
+    
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -30,14 +32,15 @@ class Application(tk.Frame):
 
     def create_widgets(self):
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
 
         self.create_button_frame()
+        self.create_stats_frame()
         self.create_results_tree()
 
     def create_button_frame(self):
         button_frame = ttk.Frame(self)
-        button_frame.grid(row=0, column=0, pady=10, padx=10, sticky="ew")
+        button_frame.grid(row=0, column=0, pady=(10,5), padx=10, sticky="ew")
 
         buttons = [
             ("폴더 선택", self.select_folder),
@@ -52,9 +55,74 @@ class Application(tk.Frame):
         self.save_results_button = button_frame.winfo_children()[-1]
         self.save_results_button.config(state=tk.DISABLED)
 
+    def create_stats_frame(self):
+        self.stats_frame = ttk.Frame(self)
+        self.stats_frame.grid(row=1, column=0, pady=(0,5), padx=10, sticky="ew")
+
+        self.stats_toggle = ttk.Button(self.stats_frame, text="통계 보기", command=self.toggle_stats)
+        self.stats_toggle.pack(side=tk.LEFT, padx=(0, 5))
+        self.stats_toggle.config(state=tk.DISABLED)
+
+        self.stats_content = ttk.Frame(self.stats_frame)
+        self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.stats_content.pack_forget()  # 초기에는 숨김
+
+    def toggle_stats(self):
+        if self.stats_content.winfo_manager():
+            self.stats_content.pack_forget()
+            self.stats_toggle.config(text="통계 보기")
+        else:
+            self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
+            self.stats_toggle.config(text="통계 숨기기")
+            self.update_stats()
+
+    def update_stats(self):
+        for widget in self.stats_content.winfo_children():
+            widget.destroy()
+
+        if not self.results:
+            ttk.Label(self.stats_content, text="결과가 없습니다.").pack()
+            return
+
+        # 전체 에러 개수를 표시할 프레임
+        total_frame = ttk.Frame(self.stats_content)
+        total_frame.pack(side=tk.LEFT, padx=(0, 10), fill=tk.Y)
+
+        ttk.Label(total_frame, text="Total", font=('TkDefaultFont', 12, 'bold')).pack(anchor=tk.W)
+
+        total_errors = sum(len(errors) for errors in self.results.values())
+        ttk.Label(total_frame, text=str(total_errors), font=('TkDefaultFont', 24, 'bold')).pack(anchor=tk.W, pady=(5, 0))
+
+        for lang in self.LANGUAGE_ORDER:
+            if lang in self.results:
+                errors = self.results[lang]
+                lang_frame = ttk.LabelFrame(self.stats_content, text=lang)
+                lang_frame.pack(side=tk.LEFT, padx=(0, 10), fill=tk.Y)
+
+                error_counts = {}
+                lang_total = 0
+                for error in errors:
+                    if isinstance(error, dict):
+                        error_type = error['ErrorType']
+                        error_counts[error_type] = error_counts.get(error_type, 0) + 1
+                        lang_total += 1
+                    elif isinstance(error, tuple):
+                        error_counts['PARSE_ERROR'] = error_counts.get('PARSE_ERROR', 0) + 1
+                        lang_total += 1
+
+                # 언어별 전체 에러 개수를 크게 표시
+                ttk.Label(lang_frame, text=str(lang_total), font=('TkDefaultFont', 18, 'bold')).pack(anchor=tk.W, pady=(0, 5))
+
+                for error_type, count in error_counts.items():
+                    ttk.Label(lang_frame, text=f"{error_type}: {count}").pack(anchor=tk.W)
+
+        # 통계를 바로 표시
+        self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.stats_toggle.config(text="통계 숨기기")
+
     def create_results_tree(self):
         tree_frame = ttk.Frame(self)
-        tree_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        tree_frame.grid(row=2, column=0, sticky="nsew", padx=10, pady=(0,10))
         tree_frame.grid_columnconfigure(0, weight=1)
         tree_frame.grid_rowconfigure(0, weight=1)
 
@@ -86,17 +154,22 @@ class Application(tk.Frame):
         if self.folder_path:
             self.results = process_folder(self.folder_path, self.settings)
             self.display_results(self.results)
+            self.update_stats()
             self.save_results_button.config(state=tk.NORMAL)
+            self.stats_toggle.config(state=tk.NORMAL)
+            self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
+            self.stats_toggle.config(text="통계 숨기기")
 
     def open_settings(self):
         ErrorSettingsWindow(self, self.settings)
 
     def display_results(self, results):
         self.results_tree.delete(*self.results_tree.get_children())
-        for lang, lang_results in results.items():
-            lang_node = self.results_tree.insert("", "end", text=lang)
-            for error in lang_results:
-                self.insert_error(lang_node, error)
+        for lang in self.LANGUAGE_ORDER:
+            if lang in results:
+                lang_node = self.results_tree.insert("", "end", text=lang)
+                for error in results[lang]:
+                    self.insert_error(lang_node, error)
 
     def insert_error(self, parent, error):
         if isinstance(error, dict):
@@ -179,18 +252,19 @@ class Application(tk.Frame):
 
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
-                for lang, lang_results in self.results.items():
-                    f.write(f"Language: {lang}\n")
-                    f.write("-" * 50 + "\n")
-                    for error in lang_results:
-                        if isinstance(error, dict):
-                            for key, value in error.items():
-                                f.write(f"{key}: {value}\n")
-                        elif isinstance(error, tuple):
-                            f.write(f"File: {error[0]}\n")
-                            f.write(f"Error: PARSE_ERROR\n")
-                            f.write(f"Details: {error[1]}\n")
+                for lang in self.LANGUAGE_ORDER:
+                    if lang in self.results:
+                        f.write(f"Language: {lang}\n")
                         f.write("-" * 50 + "\n")
+                        for error in self.results[lang]:
+                            if isinstance(error, dict):
+                                for key, value in error.items():
+                                    f.write(f"{key}: {value}\n")
+                            elif isinstance(error, tuple):
+                                f.write(f"File: {error[0]}\n")
+                                f.write(f"Error: PARSE_ERROR\n")
+                                f.write(f"Details: {error[1]}\n")
+                            f.write("-" * 50 + "\n")
             messagebox.showinfo("알림", f"결과가 {file_path}에 저장되었습니다.")
         except Exception as e:
             messagebox.showerror("오류", f"결과 저장 중 오류 발생: {str(e)}")
