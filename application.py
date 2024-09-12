@@ -7,6 +7,7 @@ from srt_processor import process_folder
 import sys
 import subprocess
 import platform
+import pyperclip
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -123,12 +124,21 @@ class Application(tk.Frame):
     def on_double_click(self, event):
         item = self.results_tree.selection()[0]
         column = self.results_tree.identify_column(event.x)
-        if column == '#1':
-            file_name = self.results_tree.item(item, "values")[0]
+        values = self.results_tree.item(item, "values")
+        file_name = values[0]
+        
+        if column == '#1':  # File 열
             self.open_file(file_name)
-        elif column == '#5':
+        elif column == '#2':  # StartTC 열
+            start_tc = values[1]
+            self.copy_start_tc_and_open_file(start_tc, file_name)
+        elif column == '#5':  # SubtitleText 열 (기존 기능 유지)
             text = self.results_tree.item(item, "tags")[0]
             self.show_full_text(text)
+
+    def copy_start_tc_and_open_file(self, start_tc, file_name):
+        pyperclip.copy(start_tc)
+        self.open_file(file_name)
 
     def show_full_text(self, text):
         popup = tk.Toplevel(self)
