@@ -23,7 +23,7 @@ class ErrorSettingsWindow(tk.Toplevel):
         main_frame = ttk.Frame(self)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        self.canvas = tk.Canvas(main_frame)
+        self.canvas = tk.Canvas(main_frame, highlightthickness=0)
         scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = ttk.Frame(self.canvas)
 
@@ -47,9 +47,9 @@ class ErrorSettingsWindow(tk.Toplevel):
 
         self.lang_vars = {}
 
-        for error in self.settings['errors']:
+        for i, error in enumerate(self.settings['errors']):
             error_frame = ttk.Frame(self.scrollable_frame)
-            error_frame.pack(fill=tk.X, padx=10, pady=5, ipadx=5, ipady=5)
+            error_frame.pack(fill=tk.X, padx=10, pady=(10, 0), ipadx=5, ipady=5)
             
             error_label = ttk.Label(error_frame, text=error['name'], font=('TkDefaultFont', 12, 'bold'))
             error_label.pack(anchor=tk.W, pady=(0, 5))
@@ -62,12 +62,13 @@ class ErrorSettingsWindow(tk.Toplevel):
             lang_frame.pack(fill=tk.X, pady=5)
             
             self.lang_vars[error['name']] = {}
-            for i, lang in enumerate(['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']):
+            for j, lang in enumerate(['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']):
                 var = tk.BooleanVar(value=error['languages'].get(lang, False))
-                ttk.Checkbutton(lang_frame, text=lang, variable=var).grid(row=i//4, column=i%4, sticky=tk.W, padx=5, pady=2)
+                ttk.Checkbutton(lang_frame, text=lang, variable=var).grid(row=j//4, column=j%4, sticky=tk.W, padx=5, pady=2)
                 self.lang_vars[error['name']][lang] = var
 
-            ttk.Separator(self.scrollable_frame, orient='horizontal').pack(fill=tk.X, padx=10, pady=10)
+            if i < len(self.settings['errors']) - 1:  # 마지막 항목 이전까지만 구분선 추가
+                ttk.Separator(self.scrollable_frame, orient='horizontal').pack(fill=tk.X, padx=10, pady=(10, 0))
 
         button_frame = ttk.Frame(self)
         button_frame.pack(pady=10, padx=20, fill=tk.X)
