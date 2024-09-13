@@ -1,10 +1,21 @@
 import json
 import os
+import sys
 
 class SettingsManager:
     def __init__(self, settings_file):
-        self.settings_file = settings_file
+        self.settings_file = self.get_settings_file_path(settings_file)
         self.settings = self.load_settings()
+
+    def get_settings_file_path(self, settings_file):
+        if getattr(sys, 'frozen', False):
+            # PyInstaller로 빌드된 실행 파일인 경우
+            application_path = os.path.dirname(sys.executable)
+        else:
+            # 스크립트로 실행되는 경우
+            application_path = os.path.dirname(os.path.abspath(__file__))
+        
+        return os.path.join(application_path, settings_file)
 
     def load_settings(self):
         default_languages = {lang: True for lang in ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']}
@@ -33,8 +44,12 @@ class SettingsManager:
             return default_settings
 
     def save_settings(self):
-        with open(self.settings_file, 'w', encoding='utf-8') as f:
-            json.dump(self.settings, f, ensure_ascii=False, indent=2)
+        try:
+            with open(self.settings_file, 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"설정 저장 중 오류 발생: {str(e)}")
+            raise
 
     def get_settings(self):
         return self.settings

@@ -20,15 +20,10 @@ class Application(tk.Frame):
         self.results = None
         self.folder_path = None
         
-        self.settings_file = self.get_settings_file_path()
-        self.settings_manager = SettingsManager(self.settings_file)
+        self.settings_manager = SettingsManager("srt_checker_settings.json")
         self.settings = self.settings_manager.get_settings()
         
         self.create_widgets()
-
-    def get_settings_file_path(self):
-        app_dir = os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__)
-        return os.path.join(app_dir, "srt_checker_settings.json")
 
     def create_widgets(self):
         self.grid_columnconfigure(0, weight=1)
