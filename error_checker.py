@@ -36,8 +36,10 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_hyphen_space(srt_file, lang_code, file_name, False))
             elif error_check['name'] == "불필요한 공백":
                 errors.extend(check_space_errors(srt_file, lang_code, file_name))
-            elif error_check['name'] == "전각 물결 표시":
-                errors.extend(check_fullwidth_tilde(srt_file, lang_code, file_name))
+            elif error_check['name'] == "일반 물결":
+                errors.extend(check_normal_tilde(srt_file, lang_code, file_name))
+            elif error_check['name'] == "음표 기호":
+                errors.extend(check_music_note(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -239,22 +241,62 @@ def check_space_errors(srt_file, lang_code, file_name):
     
     return errors
 
-def check_fullwidth_tilde(srt_file, lang_code, file_name):
+def check_normal_tilde(srt_file, lang_code, file_name):
     errors = []
-    fullwidth_tilde = '〜'
+    normal_tilde = '~' 
     
     for sub in srt_file:
         lines = sub.text.split('\n')
         for line_num, line in enumerate(lines, 1):
-            if fullwidth_tilde in line:
-                positions = [i for i, char in enumerate(line) if char == fullwidth_tilde]
+            if normal_tilde in line:
+                positions = [i for i, char in enumerate(line) if char == normal_tilde]
                 for pos in positions:
                     error = {
                         "File": file_name,
                         "StartTC": str(sub.start),
-                        "ErrorType": "전각 물결 표시",
+                        "ErrorType": "일반 물결",
                         "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
                         "SubtitleText": sub.text
                     }
                     errors.append(error)
+    return errors
+
+def check_music_note(srt_file, lang_code, file_name):
+    errors = []
+    music_note = '♪'
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if music_note in line:
+                note_count = line.count(music_note)
+                if note_count != 2:
+                    errors.append({
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "음표 기호 개수",
+                        "ErrorContent": f"{line_num}번째 줄: 한 줄에 음표 기호가 2개가 아님 (현재 {note_count}개)",
+                        "SubtitleText": sub.text
+                    })
+                else:
+                    first_note_index = line.index(music_note)
+                    second_note_index = line.rindex(music_note)
+                    
+                    if first_note_index + 1 < len(line) and line[first_note_index + 1] != ' ':
+                        errors.append({
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": "음표 기호 공백",
+                            "ErrorContent": f"{line_num}번째 줄: 첫 번째 음표 기호 뒤에 공백 없음",
+                            "SubtitleText": sub.text
+                        })
+                    
+                    if second_note_index > 0 and line[second_note_index - 1] != ' ':
+                        errors.append({
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": "음표 기호 공백",
+                            "ErrorContent": f"{line_num}번째 줄: 두 번째 음표 기호 앞에 공백 없음",
+                            "SubtitleText": sub.text
+                        })
     return errors
