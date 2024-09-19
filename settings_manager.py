@@ -32,7 +32,8 @@ class SettingsManager:
                 {"name": "하이픈 뒤 공백X", "languages": {"KOR": True, "ENG": False, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": False, "THA": True}},
                 {"name": "불필요한 공백", "languages": default_languages.copy()},
                 {"name": "일반 물결", "languages": {"KOR": False, "ENG": False, "JPN": True, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
-                {"name": "음표 기호", "languages": default_languages.copy()}
+                {"name": "음표 기호", "languages": default_languages.copy()},
+                {"name": "블러 기호", "languages": default_languages.copy()}
             ]
         }
         

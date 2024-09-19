@@ -40,6 +40,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_normal_tilde(srt_file, lang_code, file_name))
             elif error_check['name'] == "음표 기호":
                 errors.extend(check_music_note(srt_file, lang_code, file_name))
+            elif error_check['name'] == "블러 기호":
+                errors.extend(check_blur_symbol(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -299,4 +301,24 @@ def check_music_note(srt_file, lang_code, file_name):
                             "ErrorContent": f"{line_num}번째 줄: 두 번째 음표 기호 앞에 공백 없음",
                             "SubtitleText": sub.text
                         })
+    return errors
+
+def check_blur_symbol(srt_file, lang_code, file_name):
+    errors = []
+    blur_symbol = '○'
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if blur_symbol in line:
+                positions = [i for i, char in enumerate(line) if char == blur_symbol]
+                for pos in positions:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "블러 기호",
+                        "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
+                        "SubtitleText": sub.text
+                    }
+                    errors.append(error)
     return errors
