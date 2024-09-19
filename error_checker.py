@@ -40,10 +40,12 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_normal_tilde(srt_file, lang_code, file_name))
             elif error_check['name'] == "음표 기호":
                 errors.extend(check_music_note(srt_file, lang_code, file_name))
-            elif error_check['name'] == "블러 기호":
+            elif error_check['name'] == "블러 처리 기호":
                 errors.extend(check_blur_symbol(srt_file, lang_code, file_name))
             elif error_check['name'] == "전각 숫자":
                 errors.extend(check_fullwidth_numbers(srt_file, lang_code, file_name))
+            elif error_check['name'] == "화면자막 위치":
+                errors.extend(check_bracket_text_position(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -100,7 +102,7 @@ def check_question_marks(srt_file, lang_code, file_name):
                     "File": file_name,
                     "StartTC": str(sub.start),
                     "ErrorType": "@@@여부",
-                    "ErrorContent": f"{line_num}번�� 줄",
+                    "ErrorContent": f"{line_num}번 줄",
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
@@ -342,4 +344,50 @@ def check_fullwidth_numbers(srt_file, lang_code, file_name):
                         "SubtitleText": sub.text
                     }
                     errors.append(error)
+    return errors
+
+def check_bracket_text_position(srt_file, lang_code, file_name):
+    errors = []
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        bracket_lines = []
+        normal_lines = []
+        is_bracket_open = False
+        opening_brackets = 0
+        closing_brackets = 0
+        
+        for i, line in enumerate(lines):
+            if '[' in line:
+                is_bracket_open = True
+                opening_brackets += line.count('[')
+            if ']' in line:
+                closing_brackets += line.count(']')
+                if opening_brackets == closing_brackets:
+                    is_bracket_open = False
+            
+            if is_bracket_open or '[' in line or ']' in line:
+                bracket_lines.append(i)
+            elif line.strip():
+                normal_lines.append(i)
+    
+        if opening_brackets != closing_brackets:
+            errors.append({
+                "File": file_name,
+                "StartTC": str(sub.start),
+                "ErrorType": "화면자막 대괄호 오류",
+                "ErrorContent": f"대괄호 쌍이 맞지 않습니다. (여는 대괄호: {opening_brackets}, 닫는 대괄호: {closing_brackets})",
+                "SubtitleText": sub.text
+            })
+        
+        if bracket_lines and normal_lines:
+            if max(normal_lines) > min(bracket_lines):
+                errors.append({
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "화면자막 위치 오류",
+                    "ErrorContent": "일반 텍스트가 화면 텍스트보다 아래에 있습니다.",
+                    "SubtitleText": sub.text
+                })
+    
     return errors
