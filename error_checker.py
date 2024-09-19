@@ -26,6 +26,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_ellipsis(srt_file, lang_code, file_name))
             elif error_check['name'] == "온점 말줄임표":
                 errors.extend(check_dot_ellipsis(srt_file, lang_code, file_name))
+            elif error_check['name'] == "온점 2,4개":
+                errors.extend(check_double_dot(srt_file, lang_code, file_name))
             elif error_check['name'] == "줄 끝 마침표":
                 errors.extend(check_end_punctuation(srt_file, lang_code, file_name))
             elif error_check['name'] == "하이픈 뒤 공백O":
@@ -128,6 +130,26 @@ def check_dot_ellipsis(srt_file, lang_code, file_name):
                     "StartTC": str(sub.start),
                     "ErrorType": "온점 말줄임표",
                     "ErrorContent": f"{line_num}번째 줄",
+                    "SubtitleText": sub.text
+                }
+                errors.append(error)
+    return errors
+
+def check_double_dot(srt_file, lang_code, file_name):
+    errors = []
+    dot_pattern = re.compile(r'(?<![.])[.]{2}(?![.])|(?<![.])[.]{4}(?![.])')
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            matches = dot_pattern.finditer(line)
+            for match in matches:
+                error_type = "온점 2개" if len(match.group()) == 2 else "온점 4개"
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": error_type,
+                    "ErrorContent": f"{line_num}번째 줄, 위치: {match.start()}",
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
