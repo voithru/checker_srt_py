@@ -36,6 +36,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_hyphen_space(srt_file, lang_code, file_name, False))
             elif error_check['name'] == "불필요한 공백":
                 errors.extend(check_space_errors(srt_file, lang_code, file_name))
+            elif error_check['name'] == "전각 물결 표시":
+                errors.extend(check_fullwidth_tilde(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -235,4 +237,24 @@ def check_space_errors(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text
                 })
     
+    return errors
+
+def check_fullwidth_tilde(srt_file, lang_code, file_name):
+    errors = []
+    fullwidth_tilde = '〜'
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if fullwidth_tilde in line:
+                positions = [i for i, char in enumerate(line) if char == fullwidth_tilde]
+                for pos in positions:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "전각 물결 표시",
+                        "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
+                        "SubtitleText": sub.text
+                    }
+                    errors.append(error)
     return errors
