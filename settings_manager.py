@@ -33,7 +33,8 @@ class SettingsManager:
                 {"name": "불필요한 공백", "languages": default_languages.copy()},
                 {"name": "일반 물결", "languages": {"KOR": False, "ENG": False, "JPN": True, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
                 {"name": "음표 기호", "languages": default_languages.copy()},
-                {"name": "블러 기호", "languages": default_languages.copy()}
+                {"name": "블러 처리 기호", "languages": default_languages.copy()},
+                {"name": "전각 숫자", "languages": default_languages.copy()}
             ]
         }
         

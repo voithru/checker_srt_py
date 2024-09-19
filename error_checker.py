@@ -42,6 +42,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_music_note(srt_file, lang_code, file_name))
             elif error_check['name'] == "블러 기호":
                 errors.extend(check_blur_symbol(srt_file, lang_code, file_name))
+            elif error_check['name'] == "전각 숫자":
+                errors.extend(check_fullwidth_numbers(srt_file, lang_code, file_name))
     return errors
 
 def check_line_length(srt_file, lang_code, file_name):
@@ -98,7 +100,7 @@ def check_question_marks(srt_file, lang_code, file_name):
                     "File": file_name,
                     "StartTC": str(sub.start),
                     "ErrorType": "@@@여부",
-                    "ErrorContent": f"{line_num}번째 줄",
+                    "ErrorContent": f"{line_num}번�� 줄",
                     "SubtitleText": sub.text
                 }
                 errors.append(error)
@@ -316,8 +318,27 @@ def check_blur_symbol(srt_file, lang_code, file_name):
                     error = {
                         "File": file_name,
                         "StartTC": str(sub.start),
-                        "ErrorType": "블러 기호",
+                        "ErrorType": "블러 처리 기호",
                         "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
+                        "SubtitleText": sub.text
+                    }
+                    errors.append(error)
+    return errors
+
+def check_fullwidth_numbers(srt_file, lang_code, file_name):
+    errors = []
+    fullwidth_numbers = '０１２３４５６７８９'  # 전각 숫자들
+    
+    for sub in srt_file:
+        lines = sub.text.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            for i, char in enumerate(line):
+                if char in fullwidth_numbers:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "전각 숫자",
+                        "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}",
                         "SubtitleText": sub.text
                     }
                     errors.append(error)
