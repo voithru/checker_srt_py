@@ -14,11 +14,11 @@ class SettingsManager:
         else:
             # 스크립트로 실행되는 경우
             application_path = os.path.dirname(os.path.abspath(__file__))
-        
         return os.path.join(application_path, settings_file)
 
     def load_settings(self):
-        default_languages = {lang: True for lang in ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']}
+        default_languages = \
+            {lang: True for lang in ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']}
         default_settings = {
             "errors": [
                 {"name": "줄당 자수", "languages": default_languages.copy()},
@@ -38,7 +38,6 @@ class SettingsManager:
                 {"name": "화면자막 위치", "languages": default_languages.copy()}
             ]
         }
-        
         if os.path.exists(self.settings_file):
             try:
                 with open(self.settings_file, 'r', encoding='utf-8') as f:
