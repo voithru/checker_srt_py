@@ -20,7 +20,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
                 errors.extend(check_line_length(srt_file, lang_code, file_name))
             elif error_check['name'] == "줄 수":
                 errors.extend(check_line_count(srt_file, lang_code, file_name))
-            elif error_check['name'] == "???여부":
+            elif error_check['name'] == "@@@여부":
                 errors.extend(check_question_marks(srt_file, lang_code, file_name))
             elif error_check['name'] == "중간 말줄임표":
                 errors.extend(check_ellipsis(srt_file, lang_code, file_name))
@@ -85,11 +85,11 @@ def check_question_marks(srt_file, lang_code, file_name):
     for sub in srt_file:
         lines = sub.text.split('\n')
         for line_num, line in enumerate(lines, 1):
-            if '???' in line:
+            if '@@@' in line:
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
-                    "ErrorType": "???여부",
+                    "ErrorType": "@@@여부",
                     "ErrorContent": f"{line_num}번째 줄",
                     "SubtitleText": sub.text
                 }
