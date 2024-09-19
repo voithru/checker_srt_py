@@ -40,15 +40,18 @@ class Application(tk.Frame):
         buttons = [
             ("폴더 선택", self.select_folder),
             ("에러 설정", self.open_settings),
-            ("결과 저장", self.save_results_to_file)
+            ("결과 저장", self.save_results_to_file),
+            ("폴더 재검사", self.recheck_folder)
         ]
 
         for text, command in buttons:
             button = ttk.Button(button_frame, text=text, command=command)
             button.pack(side=tk.LEFT, padx=(0, 5))
 
-        self.save_results_button = button_frame.winfo_children()[-1]
+        self.save_results_button = button_frame.winfo_children()[-2]  # 결과 저장 버튼
+        self.recheck_button = button_frame.winfo_children()[-1]  # 폴더 재검사 버튼
         self.save_results_button.config(state=tk.DISABLED)
+        self.recheck_button.config(state=tk.DISABLED)
 
     def create_stats_frame(self):
         self.stats_frame = ttk.Frame(self)
@@ -60,7 +63,7 @@ class Application(tk.Frame):
 
         self.stats_content = ttk.Frame(self.stats_frame)
         self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        self.stats_content.pack_forget()  # 초기에는 숨김
+        self.stats_content.pack_forget()
 
     def toggle_stats(self):
         if self.stats_content.winfo_manager():
@@ -147,13 +150,24 @@ class Application(tk.Frame):
     def select_folder(self):
         self.folder_path = filedialog.askdirectory()
         if self.folder_path:
+            self.process_folder()
+
+    def process_folder(self):
+        if self.folder_path:
             self.results = process_folder(self.folder_path, self.settings)
             self.display_results(self.results)
             self.update_stats()
             self.save_results_button.config(state=tk.NORMAL)
+            self.recheck_button.config(state=tk.NORMAL)
             self.stats_toggle.config(state=tk.NORMAL)
             self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
             self.stats_toggle.config(text="통계 숨기기")
+
+    def recheck_folder(self):
+        if self.folder_path:
+            self.process_folder()
+        else:
+            messagebox.showerror("오류", "재검사할 폴더가 선택되지 않았습니다.")
 
     def open_settings(self):
         ErrorSettingsWindow(self, self.settings)
