@@ -4,11 +4,10 @@ import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 운영 체제별 설정
 if sys.platform.startswith('win'):
     separator = ';'
     add_data_format = '{};.'
-else:  # macOS 및 Linux
+else:
     separator = ':'
     add_data_format = '{}:.'
 
