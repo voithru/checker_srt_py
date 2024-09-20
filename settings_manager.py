@@ -17,21 +17,69 @@ class SettingsManager:
         return os.path.join(application_path, settings_file)
 
     def load_settings(self):
-        default_languages = \
-            {lang: True for lang in ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']}
+        default_languages = {
+            lang: True for lang in ['KOR', 'ENG', 'JPN', 'CHN', 'SPA', 'VIE', 'IND', 'THA']}
         default_settings = {
             "errors": [
                 {"name": "줄당 자수", "languages": default_languages.copy()},
                 {"name": "줄 수", "languages": default_languages.copy()},
                 {"name": "@@@여부", "languages": default_languages.copy()},
-                {"name": "중간 말줄임표", "languages": {"KOR": True, "ENG": False, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
-                {"name": "온점 말줄임표", "languages": {"KOR": False, "ENG": True, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": True, "THA": True}},
+                {"name": "중간 말줄임표", "languages": {
+                    "KOR": True,
+                    "ENG": False,
+                    "JPN": False,
+                    "CHN": False,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False}},
+                {"name": "온점 말줄임표", "languages": {
+                    "KOR": False,
+                    "ENG": True,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": True,
+                    "VIE": True,
+                    "IND": True,
+                    "THA": True}},
                 {"name": "온점 2,4개", "languages": default_languages.copy()},
-                {"name": "줄 끝 마침표", "languages": {"KOR": True, "ENG": True, "JPN": True, "CHN": True, "SPA": False, "VIE": True, "IND": False, "THA": True}},
-                {"name": "하이픈 뒤 공백O", "languages": {"KOR": False, "ENG": True, "JPN": False, "CHN": False, "SPA": False, "VIE": False, "IND": True, "THA": False}},
-                {"name": "하이픈 뒤 공백X", "languages": {"KOR": True, "ENG": False, "JPN": True, "CHN": True, "SPA": True, "VIE": True, "IND": False, "THA": True}},
+                {"name": "줄 끝 마침표", "languages": {
+                    "KOR": True,
+                    "ENG": True,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": False,
+                    "VIE": True,
+                    "IND": False,
+                    "THA": True}},
+                {"name": "하이픈 뒤 공백O", "languages": {
+                    "KOR": False,
+                    "ENG": True,
+                    "JPN": False,
+                    "CHN": False,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": True,
+                    "THA": False}},
+                {"name": "하이픈 뒤 공백X", "languages": {
+                    "KOR": True,
+                    "ENG": False,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": True,
+                    "VIE": True,
+                    "IND": False,
+                    "THA": True}},
                 {"name": "불필요한 공백", "languages": default_languages.copy()},
-                {"name": "일반 물결", "languages": {"KOR": False, "ENG": False, "JPN": True, "CHN": False, "SPA": False, "VIE": False, "IND": False, "THA": False}},
+                {"name": "일반 물결", "languages": {
+                    "KOR": False,
+                    "ENG": False,
+                    "JPN": True,
+                    "CHN": False,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False}},
                 {"name": "음표 기호", "languages": default_languages.copy()},
                 {"name": "블러 기호", "languages": default_languages.copy()},
                 {"name": "전각 숫자", "languages": default_languages.copy()},
