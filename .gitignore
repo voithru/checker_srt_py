@@ -3,3 +3,4 @@ __pycache__/
 srt_checker_settings.json
 dist/
 build/
+배포파일/
