@@ -410,8 +410,7 @@ def check_bracket_text_position(srt_file, lang_code, file_name):
                     "File": file_name,
                     "StartTC": str(sub.start),
                     "ErrorType": "화면자막 대괄호 오류",
-                    "ErrorContent": f"대괄호 쌍이 맞지 않습니다. \
-                        (여는 대괄호: {opening_brackets}, 닫는 대괄호: {closing_brackets})",
+                    "ErrorContent": f"대괄호 쌍이 맞지 않습니다. (여는 대괄호: {opening_brackets}, 닫는 대괄호: {closing_brackets})",
                     "SubtitleText": sub.text,
                 }
             )

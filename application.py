@@ -7,6 +7,7 @@ from srt_processor import process_folder
 import subprocess
 import platform
 import pyperclip
+import webbrowser
 
 
 class Application(tk.Frame):
@@ -42,6 +43,8 @@ class Application(tk.Frame):
             ("에러 설정", self.open_settings),
             ("결과 저장", self.save_results_to_file),
             ("폴더 재검사", self.recheck_folder),
+            ("폴더 재검사", self.recheck_folder),
+
         ]
 
         for text, command in buttons:
@@ -52,6 +55,13 @@ class Application(tk.Frame):
         self.recheck_button = button_frame.winfo_children()[-1]  # 폴더 재검사 버튼
         self.save_results_button.config(state=tk.DISABLED)
         self.recheck_button.config(state=tk.DISABLED)
+
+        # 화면 설명서 버튼 추가
+        help_button = ttk.Button(button_frame, text="화면 설명서", command=self.open_help_url)
+        help_button.pack(side=tk.RIGHT, padx=(5, 0))
+
+    def open_help_url(self):
+        webbrowser.open("https://www.figma.com/board/VLNNmvCkn7N7bbczbjnzPA/subtitle_cheker?node-id=0-1&t=ptPGO00fcSiR6XdR-1")  # 원하는 URL로 변경
 
     def create_stats_frame(self):
         self.stats_frame = ttk.Frame(self)
