@@ -112,7 +112,7 @@ class ErrorSettingsWindow(tk.Toplevel):
                 text="전체선택/해제",
                 variable=all_var,
                 command=lambda e=error["name"], v=all_var: self.toggle_all(e, v),
-            ).grid(row=0, column=1, sticky=tk.W)
+            ).grid(row=0, column=1, sticky=tk.E)
 
             lang_frame = ttk.Frame(error_frame)
             lang_frame.grid(row=1, column=0, columnspan=2, pady=5)

@@ -43,8 +43,6 @@ class Application(tk.Frame):
             ("에러 설정", self.open_settings),
             ("결과 저장", self.save_results_to_file),
             ("폴더 재검사", self.recheck_folder),
-            ("폴더 재검사", self.recheck_folder),
-
         ]
 
         for text, command in buttons:

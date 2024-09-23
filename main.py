@@ -1,7 +1,7 @@
 import tkinter as tk
-from application import Application
 import sys
 from pathlib import Path
+from application import Application
 
 
 def setup_environment():
