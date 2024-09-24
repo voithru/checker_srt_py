@@ -83,7 +83,7 @@ class SettingsManager:
                 {"name": "음표 기호", "languages": default_languages.copy()},
                 {"name": "블러 기호", "languages": default_languages.copy()},
                 {"name": "전각 숫자", "languages": default_languages.copy()},
-                {"name": "화면자막 위치", "languages": default_languages.copy()}
+                {"name": "화면자막 위치", "languages": default_languages.copy()},
             ]
         }
         if os.path.exists(self.settings_file):

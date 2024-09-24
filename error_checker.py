@@ -96,13 +96,14 @@ def check_line_count(srt_file, lang_code, file_name):
     return errors
 
 
-def check_question_marks(srt_file, lang_code, file_name):
+def check_at_marks(srt_file, lang_code, file_name):
     errors = []
+    at_marks = ['@@@', '＠＠＠']  # 골뱅이 리스트
 
     for sub in srt_file:
         lines = sub.text.split("\n")
         for line_num, line in enumerate(lines, 1):
-            if "@@@" in line:
+            if any(at_mark in line for at_mark in at_marks):
                 error = {
                     "File": file_name,
                     "StartTC": str(sub.start),
