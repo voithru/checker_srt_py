@@ -517,6 +517,7 @@ def check_question_exclamation_usage(srt_file, lang_code, file_name):
     halfwidth_symbols = "!?"
     fullwidth_symbols = "！？"
     question_exclamation = "!?！？"
+    exception_mark = "…"
 
     for sub in srt_file:
         lines = sub.text.split("\n")
@@ -536,7 +537,7 @@ def check_question_exclamation_usage(srt_file, lang_code, file_name):
                                 "SubtitleText": sub.text,
                             }
                             errors.append(error)
-                        elif (prev_char not in question_exclamation if prev_char else True) and (next_char not in question_exclamation if next_char else True):
+                        elif (prev_char not in question_exclamation+exception_mark if prev_char else True) and (next_char not in question_exclamation+exception_mark if next_char else True):
                             error = {
                                 "File": file_name,
                                 "StartTC": str(sub.start),
