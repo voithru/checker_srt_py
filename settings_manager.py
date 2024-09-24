@@ -84,6 +84,16 @@ class SettingsManager:
                 {"name": "블러 기호", "languages": default_languages.copy()},
                 {"name": "전각 숫자", "languages": default_languages.copy()},
                 {"name": "화면자막 위치", "languages": default_languages.copy()},
+                {"name": "중국어 따옴표 사용", "languages": {
+                    "KOR": False,
+                    "ENG": False,
+                    "JPN": False,
+                    "CHN": True,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False}
+                 },
             ]
         }
         if os.path.exists(self.settings_file):

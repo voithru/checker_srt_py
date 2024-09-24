@@ -19,7 +19,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
     error_checks = {
         "줄당 자수": check_line_length,
         "줄 수": check_line_count,
-        "@@@여부": check_question_marks,
+        "@@@여부": check_at_marks,
         "중간 말줄임표": check_ellipsis,
         "온점 말줄임표": check_dot_ellipsis,
         "온점 2,4개": check_double_dot,
@@ -36,6 +36,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "블러 처리 기호": check_blur_symbol,
         "전각 숫자": check_fullwidth_numbers,
         "화면자막 위치": check_bracket_text_position,
+        "중국어 따옴표 사용": check_chinese_quotes,
     }
 
     for error_check in settings["errors"]:
@@ -428,4 +429,23 @@ def check_bracket_text_position(srt_file, lang_code, file_name):
                     }
                 )
 
+    return errors
+
+def check_chinese_quotes(srt_file, lang_code, file_name):
+    errors = []
+    chinese_quotes = ['“', '”', '‘', '’']  # 중국어 큰따옴표와 작은따옴표
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            for quote in chinese_quotes:
+                if quote in line:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "중국어 따옴표 사용",
+                        "ErrorContent": f"{line_num}번째 줄, 위치: {line.index(quote)}, 문자: {quote}",
+                        "SubtitleText": sub.text,
+                    }
+                    errors.append(error)
     return errors
