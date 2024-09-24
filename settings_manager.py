@@ -94,6 +94,27 @@ class SettingsManager:
                     "IND": False,
                     "THA": False}
                  },
+                 {"name": "괄호 사용", "languages": {
+                    "KOR": False,
+                    "ENG": False,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False}
+                 },
+                 {"name": "물음표/느낌표 사용", "languages": {
+                    "KOR": False,
+                    "ENG": False,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False}
+                 },
+                 {"name": "KOR 사용", "languages": default_languages.copy()},
             ]
         }
         if os.path.exists(self.settings_file):

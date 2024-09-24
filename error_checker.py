@@ -37,6 +37,9 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "전각 숫자": check_fullwidth_numbers,
         "화면자막 위치": check_bracket_text_position,
         "중국어 따옴표 사용": check_chinese_quotes,
+        "괄호 사용": check_bracket_usage,
+        "물음표/느낌표 사용": check_question_exclamation_usage,
+        "KOR 사용": check_korean_language, 
     }
 
     for error_check in settings["errors"]:
@@ -448,4 +451,140 @@ def check_chinese_quotes(srt_file, lang_code, file_name):
                         "SubtitleText": sub.text,
                     }
                     errors.append(error)
+    return errors
+
+def check_bracket_usage(srt_file, lang_code, file_name):
+    errors = []
+    
+    # 언어별 기준 설정
+    criteria = {
+        "JPN": {
+            "parentheses": "fullwidth",  # 소괄호는 전각이어야 함
+            "brackets": "halfwidth",     # 대괄호는 반각이어야 함
+        },
+        "CHN": {
+            "parentheses": "halfwidth",  # 소괄호는 반각이어야 함
+            "brackets": "halfwidth",     # 대괄호는 반각이어야 함
+        },
+        # 다른 언어에 대한 기준을 여기에 추가
+    }
+    
+    # 반각 및 전각 기호 정의
+    halfwidth_parentheses = "()"
+    fullwidth_parentheses = "（）"
+    halfwidth_brackets = "[]"
+    fullwidth_brackets = "［］"
+    
+    # 현재 언어의 기준 가져오기
+    if lang_code not in criteria:
+        return errors  # 기준이 없는 언어는 검사하지 않음
+    
+    current_criteria = criteria[lang_code]
+    
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            for i, char in enumerate(line):
+                if char in halfwidth_parentheses + fullwidth_parentheses:
+                    expected = current_criteria["parentheses"]
+                    if (char in halfwidth_parentheses and expected == "fullwidth") or \
+                       (char in fullwidth_parentheses and expected == "halfwidth"):
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": "소괄호 사용 오류",
+                            "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}",
+                            "SubtitleText": sub.text,
+                        }
+                        errors.append(error)
+                elif char in halfwidth_brackets + fullwidth_brackets:
+                    expected = current_criteria["brackets"]
+                    if (char in halfwidth_brackets and expected == "fullwidth") or \
+                       (char in fullwidth_brackets and expected == "halfwidth"):
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": "대괄호 사용 오류",
+                            "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}",
+                            "SubtitleText": sub.text,
+                        }
+                        errors.append(error)
+    return errors
+
+
+def check_question_exclamation_usage(srt_file, lang_code, file_name):
+    errors = []
+    halfwidth_symbols = "!?"
+    fullwidth_symbols = "！？"
+    question_exclamation = "!?！？"
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            for i, char in enumerate(line):
+                if char in question_exclamation:
+                    prev_char = line[i-1] if i > 0 else None
+                    next_char = line[i+1] if i < len(line) - 1 else None
+
+                    if char in halfwidth_symbols:
+                        if (prev_char in fullwidth_symbols if prev_char else False) or (next_char in fullwidth_symbols if next_char else False):
+                            error = {
+                                "File": file_name,
+                                "StartTC": str(sub.start),
+                                "ErrorType": "반각 ?! 주위 전각 ?!",
+                                "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}",
+                                "SubtitleText": sub.text,
+                            }
+                            errors.append(error)
+                        elif (prev_char not in question_exclamation if prev_char else True) and (next_char not in question_exclamation if next_char else True):
+                            error = {
+                                "File": file_name,
+                                "StartTC": str(sub.start),
+                                "ErrorType": "반각 ?! 주위 부호 없음",
+                                "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}는 전각이어야 합니다.",
+                                "SubtitleText": sub.text,
+                            }
+                            errors.append(error)
+                    elif char in fullwidth_symbols:
+                        if (prev_char in halfwidth_symbols if prev_char else False) or (next_char in halfwidth_symbols if next_char else False):
+                            error = {
+                                "File": file_name,
+                                "StartTC": str(sub.start),
+                                "ErrorType": "전각 ?! 주위 반각 ?!",
+                                "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}",
+                                "SubtitleText": sub.text,
+                            }
+                            errors.append(error)
+                        elif (prev_char in fullwidth_symbols if prev_char else False) or (next_char in fullwidth_symbols if next_char else False):
+                            error = {
+                                "File": file_name,
+                                "StartTC": str(sub.start),
+                                "ErrorType": "전각 ?! 주위 전각 ?!",
+                                "ErrorContent": f"{line_num}번째 줄, 위치: {i}, 문자: {char}는 반각이어야 합니다.",
+                                "SubtitleText": sub.text,
+                            }
+                            errors.append(error)
+
+    return errors
+
+
+def check_korean_language(srt_file, lang_code, file_name):
+    errors = []
+    if lang_code == "KOR":
+        return errors  # 한국어 파일은 검사하지 않음
+
+    korean_char_pattern = re.compile(r'[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]')
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            if korean_char_pattern.search(line):
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "KOR 사용",
+                    "ErrorContent": f"{line_num}번째 줄에 한국어가 포함되어 있습니다.",
+                    "SubtitleText": sub.text,
+                }
+                errors.append(error)
     return errors
