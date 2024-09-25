@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_submodules
 
-hiddenimports = ['tkinter', 'tkinter.ttk', 'tkinter.filedialog', 'tkinter.messagebox', 'pyperclip']
+hiddenimports = ['tkinter', 'tkinter.ttk', 'tkinter.filedialog', 'tkinter.messagebox', 'tkinter.ttkbootstrap', 'pyperclip']
 hiddenimports += collect_submodules('pyperclip')
 
 
@@ -39,11 +39,10 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['/Users/p-156/dev/checker_srt_py/icon.icns'],
 )
 app = BUNDLE(
     exe,
     name='SRTChecker.app',
-    icon='/Users/p-156/dev/checker_srt_py/icon.icns',
+    icon=None,
     bundle_identifier=None,
 )
