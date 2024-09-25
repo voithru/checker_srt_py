@@ -275,22 +275,23 @@ def check_space_errors(srt_file, lang_code, file_name):
 
 def check_normal_tilde(srt_file, lang_code, file_name):
     errors = []
-    normal_tilde = "~"
+    normal_tildes = ["~", "〜"]  # 일반 물결과 일본어 물결
 
     for sub in srt_file:
         lines = sub.text.split("\n")
         for line_num, line in enumerate(lines, 1):
-            if normal_tilde in line:
-                positions = [i for i, char in enumerate(line) if char == normal_tilde]
-                for pos in positions:
-                    error = {
-                        "File": file_name,
-                        "StartTC": str(sub.start),
-                        "ErrorType": "일반 물결",
-                        "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
-                        "SubtitleText": sub.text,
-                    }
-                    errors.append(error)
+            for tilde in normal_tildes:
+                if tilde in line:
+                    positions = [i for i, char in enumerate(line) if char == tilde]
+                    for pos in positions:
+                        error = {
+                            "File": file_name,
+                            "StartTC": str(sub.start),
+                            "ErrorType": "일반 물결",
+                            "ErrorContent": f"{line_num}번째 줄, 위치: {pos}, 문자: {tilde}",
+                            "SubtitleText": sub.text,
+                        }
+                        errors.append(error)
     return errors
 
 
