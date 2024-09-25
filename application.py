@@ -8,9 +8,9 @@ import subprocess
 import platform
 import pyperclip
 import webbrowser
+import ttkbootstrap as tb  # ttkbootstrap 추가
 
-
-class Application(tk.Frame):
+class Application(tb.Frame):  # tb.Frame으로 변경
     LANGUAGE_ORDER = ["KOR", "ENG", "JPN", "CHN", "SPA", "VIE", "IND", "THA"]
 
     def __init__(self, master=None):
@@ -46,7 +46,7 @@ class Application(tk.Frame):
         ]
 
         for text, command in buttons:
-            button = ttk.Button(button_frame, text=text, command=command)
+            button = tb.Button(button_frame, text=text, command=command, bootstyle="primary")  # 스타일 적용
             button.pack(side=tk.LEFT, padx=(0, 5))
 
         self.save_results_button = button_frame.winfo_children()[-2]  # 결과 저장 버튼
@@ -55,7 +55,7 @@ class Application(tk.Frame):
         self.recheck_button.config(state=tk.DISABLED)
 
         # 화면 설명서 버튼 추가
-        help_button = ttk.Button(button_frame, text="화면 설명서", command=self.open_help_url)
+        help_button = tb.Button(button_frame, text="화면 설명서", command=self.open_help_url, bootstyle="info")  # 스타일 적용
         help_button.pack(side=tk.RIGHT, padx=(5, 0))
 
     def open_help_url(self):
@@ -65,8 +65,8 @@ class Application(tk.Frame):
         self.stats_frame = ttk.Frame(self)
         self.stats_frame.grid(row=1, column=0, pady=(0, 5), padx=10, sticky="ew")
 
-        self.stats_toggle = ttk.Button(
-            self.stats_frame, text="통계 보기", command=self.toggle_stats
+        self.stats_toggle = tb.Button(
+            self.stats_frame, text="통계 보기", command=self.toggle_stats, bootstyle="secondary"
         )
         self.stats_toggle.pack(side=tk.LEFT, padx=(0, 5))
         self.stats_toggle.config(state=tk.DISABLED)
@@ -266,7 +266,7 @@ class Application(tk.Frame):
 
     def open_file(self, file_name):
         if not self.folder_path:
-            messagebox.showerror("오류", "폴더가 선택되지 않았습니다.")
+            messagebox.showerror("오류", f"파일을 찾을 수 없습니다: {full_path}")
             return
 
         full_path = os.path.join(self.folder_path, file_name)

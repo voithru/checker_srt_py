@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import platform
+import ttkbootstrap as tb  # ttkbootstrap 추가
 
 
-class ErrorSettingsWindow(tk.Toplevel):
+class ErrorSettingsWindow(tb.Toplevel):  # tb.Toplevel으로 변경
     def __init__(self, parent, settings):
         super().__init__(parent)
         self.parent = parent
@@ -38,8 +39,8 @@ class ErrorSettingsWindow(tk.Toplevel):
         content_frame.pack(fill=tk.BOTH, expand=True)
 
         self.canvas = tk.Canvas(content_frame, highlightthickness=0)
-        scrollbar = ttk.Scrollbar(
-            content_frame, orient="vertical", command=self.canvas.yview
+        scrollbar = tb.Scrollbar(
+            content_frame, orient="vertical", command=self.canvas.yview, bootstyle="round"
         )
         self.scrollable_frame = ttk.Frame(self.canvas)
 
@@ -158,8 +159,8 @@ class ErrorSettingsWindow(tk.Toplevel):
         button_frame = ttk.Frame(self)
         button_frame.pack(pady=10, padx=20, fill=tk.X)
 
-        ttk.Button(button_frame, text="취소", command=self.destroy).pack(side=tk.RIGHT)
-        ttk.Button(button_frame, text="저장", command=self.save_settings).pack(
+        tb.Button(button_frame, text="취소", command=self.destroy, bootstyle="danger-outline").pack(side=tk.RIGHT)
+        tb.Button(button_frame, text="저장", command=self.save_settings, bootstyle="success-outline").pack(
             side=tk.RIGHT, padx=10
         )
 

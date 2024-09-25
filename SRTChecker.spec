@@ -39,10 +39,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['/Users/p-156/dev/checker_srt_py/icon.icns'],
 )
 app = BUNDLE(
     exe,
     name='SRTChecker.app',
-    icon=None,
+    icon='/Users/p-156/dev/checker_srt_py/icon.icns',
     bundle_identifier=None,
 )

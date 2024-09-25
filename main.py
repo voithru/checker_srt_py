@@ -2,7 +2,7 @@ import tkinter as tk
 import sys
 from pathlib import Path
 from application import Application
-
+import ttkbootstrap as tb  # ttkbootstrap 추가
 
 def setup_environment():
     if getattr(sys, "frozen", False):
@@ -15,15 +15,16 @@ def setup_environment():
     # 애플리케이션 경로를 시스템 경로에 추가
     sys.path.append(str(application_path))
 
-
 def main():
     setup_environment()
 
-    root = tk.Tk()
+    # 기본 테마를 설정
+    theme = "litera"
+    root = tb.Window(themename=theme)  # ttkbootstrap 테마 적용
     app = Application(master=root)
+    
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()
