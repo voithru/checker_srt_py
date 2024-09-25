@@ -25,6 +25,7 @@ PyInstaller.__main__.run([
     '--hidden-import', 'tkinter.ttk',
     '--hidden-import', 'tkinter.filedialog',
     '--hidden-import', 'tkinter.messagebox',
+    '--hidden-import', 'tkinter.ttkbootstrap',
     '--hidden-import', 'pyperclip',
     '--collect-submodules', 'pyperclip',
     '--clean',
