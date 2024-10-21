@@ -40,6 +40,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "괄호 사용": check_bracket_usage,
         "물음표/느낌표 사용": check_question_exclamation_usage,
         "KOR 사용": check_korean_language, 
+        "<0x08> 사용" : check_backspace_character,
     }
 
     for error_check in settings["errors"]:
@@ -589,4 +590,24 @@ def check_korean_language(srt_file, lang_code, file_name):
                     "SubtitleText": sub.text,
                 }
                 errors.append(error)
+    return errors
+
+def check_backspace_character(srt_file, lang_code, file_name):
+    errors = []
+    backspace_char = '\x08'  # 아스키 코드 0x08
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            if backspace_char in line:
+                positions = [i for i, char in enumerate(line) if char == backspace_char]
+                for pos in positions:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "<0x08> 문자",
+                        "ErrorContent": f"{line_num}번째 줄, 위치: {pos}",
+                        "SubtitleText": sub.text,
+                    }
+                    errors.append(error)
     return errors

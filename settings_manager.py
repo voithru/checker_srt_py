@@ -115,6 +115,7 @@ class SettingsManager:
                     "THA": False}
                  },
                  {"name": "KOR 사용", "languages": default_languages.copy()},
+                 {"name": "<0x08> 사용", "languages": default_languages.copy()}
             ]
         }
         if os.path.exists(self.settings_file):
