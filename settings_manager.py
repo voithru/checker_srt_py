@@ -115,7 +115,7 @@ class SettingsManager:
                     "THA": False}
                  },
                  {"name": "KOR 사용", "languages": default_languages.copy()},
-                 {"name": "<0x08> 사용", "languages": default_languages.copy()}
+                 {"name": "특수 아스키 문자", "languages": default_languages.copy()}  # 새로운 항목 추가
             ]
         }
         if os.path.exists(self.settings_file):
