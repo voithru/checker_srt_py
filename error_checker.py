@@ -40,7 +40,8 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "괄호 사용": check_bracket_usage,
         "물음표/느낌표 사용": check_question_exclamation_usage,
         "KOR 사용": check_korean_language, 
-        "특수 아스키 문자": check_special_ascii_characters,  # 새로운 항목 추가
+        "특수 아스키 문자": check_special_ascii_characters,
+        "하이픈 1개": check_single_hyphen,
     }
 
     for error_check in settings["errors"]:
@@ -614,4 +615,29 @@ def check_special_ascii_characters(srt_file, lang_code, file_name):
                             "SubtitleText": sub.text,
                         }
                         errors.append(error)
+    return errors
+
+def check_single_hyphen(srt_file, lang_code, file_name):
+    errors = []
+    hyphen = '-'
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        hyphen_count = sum(line.count(hyphen) for line in lines)
+        leading_hyphen_lines = [line_num for line_num, line in enumerate(lines, 1) if line.strip().startswith(hyphen)]
+
+        if hyphen_count == 1:
+            error_content = "중간 하이픈 1개"
+            if leading_hyphen_lines:
+                error_content = f"맨 앞 하이픈: {', '.join(map(str, leading_hyphen_lines))}번째 줄"
+            
+            error = {
+                "File": file_name,
+                "StartTC": str(sub.start),
+                "ErrorType": "하이픈 개수 오류",
+                "ErrorContent": error_content,
+                "SubtitleText": sub.text,
+            }
+            errors.append(error)
+
     return errors
