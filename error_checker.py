@@ -42,6 +42,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "KOR 사용": check_korean_language, 
         "특수 아스키 문자": check_special_ascii_characters,
         "하이픈 1개": check_single_hyphen,
+        "대괄호 내용 오류": check_bracket_content,
     }
 
     for error_check in settings["errors"]:
@@ -639,5 +640,28 @@ def check_single_hyphen(srt_file, lang_code, file_name):
                 "SubtitleText": sub.text,
             }
             errors.append(error)
+
+    return errors
+
+def check_bracket_content(srt_file, lang_code, file_name):
+    errors = []
+    bracket_pattern = re.compile(r'\[(.*?)\]')  # 대괄호 안의 내용을 찾는 정규식
+
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            matches = bracket_pattern.finditer(line)
+            for match in matches:
+                content = match.group(1)
+                # 특수기호나 숫자만 있는지 확인
+                if content and all(char.isdigit() or not char.isalnum() for char in content):
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "대괄호 내용 오류",
+                        "ErrorContent": f"{line_num}번째 줄, 대괄호 안에 번역할 텍스트가 없습니다: '{content}'",
+                        "SubtitleText": sub.text,
+                    }
+                    errors.append(error)
 
     return errors
