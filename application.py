@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from settings_manager import SettingsManager
 from error_settings_window import ErrorSettingsWindow
-from srt_processor import process_folder
+from srt_processor import process_folder, remove_end_tc_spaces
 import subprocess
 import platform
 import pyperclip
@@ -43,19 +43,23 @@ class Application(tb.Frame):  # tb.Frame으로 변경
             ("에러 설정", self.open_settings),
             ("결과 저장", self.save_results_to_file),
             ("폴더 재검사", self.recheck_folder),
+            ("tc공백 제거", self.remove_tc_spaces),
         ]
 
         for text, command in buttons:
-            button = tb.Button(button_frame, text=text, command=command, bootstyle="primary")  # 스타일 적용
+            button = tb.Button(button_frame, text=text, command=command, bootstyle="primary")
             button.pack(side=tk.LEFT, padx=(0, 5))
 
-        self.save_results_button = button_frame.winfo_children()[-2]  # 결과 저장 버튼
-        self.recheck_button = button_frame.winfo_children()[-1]  # 폴더 재검사 버튼
+        self.save_results_button = button_frame.winfo_children()[-3]
+        self.recheck_button = button_frame.winfo_children()[-2]
+        self.remove_spaces_button = button_frame.winfo_children()[-1]
+        
         self.save_results_button.config(state=tk.DISABLED)
         self.recheck_button.config(state=tk.DISABLED)
+        self.remove_spaces_button.config(state=tk.DISABLED)
 
         # 화면 설명서 버튼 추가
-        help_button = tb.Button(button_frame, text="화면 설명서", command=self.open_help_url, bootstyle="info")  # 스타일 적용
+        help_button = tb.Button(button_frame, text="화면 설명서", command=self.open_help_url, bootstyle="info")
         help_button.pack(side=tk.RIGHT, padx=(5, 0))
 
     def open_help_url(self):
@@ -187,6 +191,7 @@ class Application(tb.Frame):  # tb.Frame으로 변경
             self.update_stats()
             self.save_results_button.config(state=tk.NORMAL)
             self.recheck_button.config(state=tk.NORMAL)
+            self.remove_spaces_button.config(state=tk.NORMAL)
             self.stats_toggle.config(state=tk.NORMAL)
             self.stats_content.pack(side=tk.LEFT, fill=tk.X, expand=True)
             self.stats_toggle.config(text="통계 숨기기")
@@ -314,3 +319,14 @@ class Application(tb.Frame):  # tb.Frame으로 변경
 
     def on_closing(self):
         self.master.destroy()
+
+    def remove_tc_spaces(self):
+        if not self.folder_path:
+            messagebox.showerror("오류", "폴더가 선택되지 않았습니다.")
+            return
+        
+        try:
+            files_modified, tc_modified = remove_end_tc_spaces(self.folder_path)
+            messagebox.showinfo("완료", f"총 {files_modified}개 파일에서 {tc_modified}개의 tc 공백이 제거되었습니다.")
+        except Exception as e:
+            messagebox.showerror("오류", f"tc 공백 제거 중 오류가 발생했습니다: {str(e)}")
