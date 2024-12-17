@@ -33,7 +33,7 @@ def remove_end_tc_spaces(folder_path):
                 modified_lines = []
                 
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, 'r', encoding='utf-8-sig') as f:
                         lines = f.readlines()
                     
                     i = 0
@@ -47,14 +47,13 @@ def remove_end_tc_spaces(folder_path):
                             if cleaned_tc_line != current_line:
                                 tc_modified += 1
                             modified_lines.append(cleaned_tc_line)
-                            i += 1  # TC 라인만 처리했으므로 1줄 건너뛰기
+                            i += 1
                             continue
                         
-                        # TC 라인이 아닌 경우 그대로 추가
                         modified_lines.append(current_line)
                         i += 1
                     
-                    # 모든 파일을 UTF-8로 저장 (변경사항 유무와 관계없이)
+                    # UTF-8 without BOM으로 저장
                     with open(file_path, 'w', encoding='utf-8', newline='\n') as f:
                         f.writelines(modified_lines)
                     
