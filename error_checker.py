@@ -61,9 +61,9 @@ def check_errors(srt_file, lang_code, file_name, settings):
 def check_line_length(srt_file, lang_code, file_name):
     errors = []
     max_lengths = {
-        "KOR": 20,
-        "ENG": 42,
-        "JPN": 16,
+        "KOR": 35,  # 35자까지 허용
+        "ENG": 46,  # 46자까지 허용
+        "JPN": 24,  # 24자까지 허용
         "CHN": 20,
         "SPA": 42,
         "VIE": 42,
@@ -91,7 +91,7 @@ def check_line_length(srt_file, lang_code, file_name):
 
 def check_line_count(srt_file, lang_code, file_name):
     errors = []
-    max_lines = 3
+    max_lines = 2  # 2줄까지 허용, 3줄부터 에러
 
     for sub in srt_file:
         lines = sub.text.split("\n")
