@@ -52,6 +52,15 @@ class SettingsManager:
                     "VIE": True,
                     "IND": False,
                     "THA": True}},
+                {"name": "줄 끝 마침표 누락", "languages": {
+                    "KOR": True,
+                    "ENG": True,
+                    "JPN": True,
+                    "CHN": True,
+                    "SPA": True,
+                    "VIE": True,
+                    "IND": True,
+                    "THA": True}},
                 {"name": "하이픈 뒤 공백O", "languages": {
                     "KOR": False,
                     "ENG": True,
@@ -116,7 +125,18 @@ class SettingsManager:
                  },
                  {"name": "KOR 사용", "languages": default_languages.copy()},
                  {"name": "특수 아스키 문자", "languages": default_languages.copy()},
-                 {"name": "대괄호 내용 오류", "languages": default_languages.copy()}
+                 {"name": "대괄호 내용 오류", "languages": default_languages.copy()},
+                 {"name": "마지막 줄 쉼표", "languages": default_languages.copy()},
+                 {"name": "일본어 구두점", "languages": {
+                    "KOR": False,
+                    "ENG": False,
+                    "JPN": True,
+                    "CHN": False,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False
+                 }}
             ]
         }
         if os.path.exists(self.settings_file):

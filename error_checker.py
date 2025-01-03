@@ -24,6 +24,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "온점 말줄임표": check_dot_ellipsis,
         "온점 2,4개": check_double_dot,
         "줄 끝 마침표": check_end_punctuation,
+        "줄 끝 마침표 누락": check_missing_end_punctuation,
         "하이픈 뒤 공백O": lambda srt, lang, fname: check_hyphen_space(
             srt, lang, fname, True
         ),
@@ -43,6 +44,9 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "특수 아스키 문자": check_special_ascii_characters,
         "하이픈 1개": check_single_hyphen,
         "대괄호 내용 오류": check_bracket_content,
+        "Duration 오류": check_duration,
+        "마지막 줄 쉼표": check_last_line_comma,
+        "일본어 구두점": check_japanese_punctuation,
     }
 
     for error_check in settings["errors"]:
@@ -664,4 +668,131 @@ def check_bracket_content(srt_file, lang_code, file_name):
                     }
                     errors.append(error)
 
+    return errors
+
+def check_duration(srt_file, lang_code, file_name):
+    errors = []
+    min_duration = 1.0  # 1초
+    max_duration = 8.0  # 8초
+
+    for sub in srt_file:
+        # 시작 시간을 초로 변환
+        start_total_seconds = (sub.start.hours * 3600 + 
+                             sub.start.minutes * 60 + 
+                             sub.start.seconds + 
+                             sub.start.milliseconds / 1000)
+        
+        # 종료 시간을 초로 변환
+        end_total_seconds = (sub.end.hours * 3600 + 
+                           sub.end.minutes * 60 + 
+                           sub.end.seconds + 
+                           sub.end.milliseconds / 1000)
+        
+        duration = end_total_seconds - start_total_seconds
+
+        if duration < min_duration:
+            error = {
+                "File": file_name,
+                "StartTC": str(sub.start),
+                "ErrorType": "Duration 오류",
+                "ErrorContent": f"자막 길이가 너무 짧습니다: {duration:.3f}초 (최소: {min_duration}초)",
+                "SubtitleText": sub.text,
+            }
+            errors.append(error)
+        elif duration > max_duration:
+            error = {
+                "File": file_name,
+                "StartTC": str(sub.start),
+                "ErrorType": "Duration 오류",
+                "ErrorContent": f"자막 길이가 너무 깁니다: {duration:.3f}초 (최대: {max_duration}초)",
+                "SubtitleText": sub.text,
+            }
+            errors.append(error)
+    return errors
+
+def check_missing_end_punctuation(srt_file, lang_code, file_name):
+    errors = []
+    # 언어별 문장 끝 부호 정의
+    end_puncts = {
+        "JPN": ["。", ".", "！", "？", "…"],  # 일본어
+        "CHN": ["。", ".", "！", "？", "…"],  # 중국어
+        "default": [".", "!", "?", "..."]     # 기타 언어
+    }
+    
+    # 예외 처리할 특수 케이스 (마침표가 없어도 되는 경우)
+    exceptions = [
+        r"^\[.*\]$",  # 대괄호로 감싸진 텍스트
+        r"^♪.*♪$"    # 음표 사이의 텍스트
+    ]
+    
+    puncts = end_puncts.get(lang_code, end_puncts["default"])
+    
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            line = line.strip()
+            if not line:  # 빈 줄 무시
+                continue
+                
+            # 예외 케이스 확인
+            if any(re.match(pattern, line) for pattern in exceptions):
+                continue
+                
+            # 마지막 줄이 아닌 경우는 건너뛰기
+            if line_num < len(lines) and lines[line_num].strip():
+                continue
+                
+            # 문장 끝 부호 확인
+            if not any(line.endswith(punct) for punct in puncts):
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "줄 끝 마침표 누락",
+                    "ErrorContent": f"{line_num}번째 줄",
+                    "SubtitleText": sub.text,
+                }
+                errors.append(error)
+    
+    return errors
+
+def check_last_line_comma(srt_file, lang_code, file_name):
+    errors = []
+    
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        # 빈 줄 제거
+        lines = [line for line in lines if line.strip()]
+        
+        if lines:  # 줄이 하나 이상 있는 경우
+            last_line = lines[-1].strip()
+            if last_line.endswith(","):
+                error = {
+                    "File": file_name,
+                    "StartTC": str(sub.start),
+                    "ErrorType": "마지막 줄 쉼표",
+                    "ErrorContent": f"마지막 줄이 쉼표로 끝납니다",
+                    "SubtitleText": sub.text,
+                }
+                errors.append(error)
+    
+    return errors
+
+def check_japanese_punctuation(srt_file, lang_code, file_name):
+    errors = []
+    western_punctuation = ['.', ',']
+        
+    for sub in srt_file:
+        lines = sub.text.split("\n")
+        for line_num, line in enumerate(lines, 1):
+            for punct in western_punctuation:
+                if punct in line:
+                    error = {
+                        "File": file_name,
+                        "StartTC": str(sub.start),
+                        "ErrorType": "일본어 구두점",
+                        "ErrorContent": f"{line_num}번째 줄: '{punct}' 사용",
+                        "SubtitleText": sub.text,
+                    }
+                    errors.append(error)
+    
     return errors
