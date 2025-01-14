@@ -5,12 +5,32 @@ import re
 def count_cjk_characters(text):
     count = 0
     for char in text:
-        if unicodedata.east_asian_width(char) in ["F", "W"]:
-            count += 1
-        elif unicodedata.east_asian_width(char) in ["Na", "H"] or char.isspace():
+        # 가타카나 (반각 처리)
+        if '\u30A0' <= char <= '\u30FF':  # 전각 가타카나 범위
             count += 0.5
-        else:
+        # 한자
+        elif '\u4E00' <= char <= '\u9FFF':  # CJK 통합 한자
             count += 1
+        # 히라가나
+        elif '\u3040' <= char <= '\u309F':
+            count += 1
+        # 공백
+        elif char.isspace():
+            count += 0.5
+        # 영문자
+        elif 'a' <= char.lower() <= 'z':
+            count += 0.5
+        # 전각 부호
+        elif unicodedata.east_asian_width(char) in ['F', 'W'] and not any([
+            '\u4E00' <= char <= '\u9FFF',  # 한자
+            '\u3040' <= char <= '\u309F',  # 히라가나
+            '\u30A0' <= char <= '\u30FF',  # 가타카나
+        ]):
+            count += 1
+        # 반각 부호 및 기타 문자
+        else:
+            count += 0.5
+    
     return count
 
 
