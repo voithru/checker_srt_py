@@ -20,6 +20,9 @@ def count_cjk_characters(text):
         # 영문자
         elif 'a' <= char.lower() <= 'z':
             count += 0.5
+        # 숫자 (0.5자 처리)
+        elif char.isdigit():
+            count += 0.5
         # 전각 부호
         elif unicodedata.east_asian_width(char) in ['F', 'W'] and not any([
             '\u4E00' <= char <= '\u9FFF',  # 한자
@@ -67,6 +70,7 @@ def check_errors(srt_file, lang_code, file_name, settings):
         "Duration 오류": check_duration,
         "마지막 줄 쉼표": check_last_line_comma,
         "일본어 구두점": check_japanese_punctuation,
+        "첫번째 자막": lambda x, y, z: check_first_subtitle(x, y, z, settings),
     }
 
     for error_check in settings["errors"]:
@@ -814,5 +818,75 @@ def check_japanese_punctuation(srt_file, lang_code, file_name):
                         "SubtitleText": sub.text,
                     }
                     errors.append(error)
+    
+    return errors
+
+def check_first_subtitle(srt_file, lang_code, file_name, settings):
+    errors = []
+    
+    # 체크할 언어가 아니면 건너뛰기
+    if lang_code not in ["KOR", "ENG", "JPN"]:
+        return errors
+        
+    # 첫번째 자막 텍스트 정의
+    first_subtitle_text = {
+        "KOR": """영상 재생 도중 자막을 끄려면
+[설정]-[말풍선 버튼]-[PC는 on, 모바일은 감추기]를 눌러주세요.""",
+        "ENG": """If you want to turn off the subtitles,
+click [setting]-[tooltips]-['on' for PC, 'close' for mobile].""",
+        "JPN": """動画再生中に字幕をOFFにするには
+「設定」-「吹き出しボタン」-「PCはon、モバイルは隠す」を押してください。"""
+    }
+    
+    # 자막이 비어있는 경우 체크
+    if not srt_file:
+        error = {
+            "File": file_name,
+            "StartTC": "00:00:00,000",
+            "ErrorType": "첫번째 자막",
+            "ErrorContent": "자막이 비어있습니다",
+            "SubtitleText": "",
+        }
+        errors.append(error)
+        return errors
+    
+    first_sub = srt_file[0]
+    
+    # SubRipTime을 초 단위로 변환
+    start_time = (first_sub.start.hours * 3600 + 
+                 first_sub.start.minutes * 60 + 
+                 first_sub.start.seconds + 
+                 first_sub.start.milliseconds / 1000)
+    
+    end_time = (first_sub.end.hours * 3600 + 
+                first_sub.end.minutes * 60 + 
+                first_sub.end.seconds + 
+                first_sub.end.milliseconds / 1000)
+    
+    # 시작 시간과 종료 시간 체크 (정확히 0.0초 ~ 5.0초)
+    if start_time != 0.0 or end_time != 5.0:
+        error = {
+            "File": file_name,
+            "StartTC": str(first_sub.start),
+            "ErrorType": "첫번째 자막",
+            "ErrorContent": f"시작/종료 시간이 올바르지 않습니다 (현재: {start_time:.1f}초 ~ {end_time:.1f}초)",
+            "SubtitleText": first_sub.text,
+        }
+        errors.append(error)
+    
+    # 텍스트 일치 여부 체크
+    expected_text = first_subtitle_text.get(lang_code, "")
+    actual_text = first_sub.text.replace('\r\n', '\n').replace('\r', '\n')
+    expected_text = expected_text.replace('\r\n', '\n').replace('\r', '\n')
+    
+    if actual_text != expected_text:
+        error = {
+            "File": file_name,
+            "StartTC": str(first_sub.start),
+            "ErrorType": "첫번째 자막",
+            "ErrorContent": "텍스트가 일치하지 않습니다",
+            "SubtitleText": first_sub.text,
+        }
+        errors.append(error)
     
     return errors

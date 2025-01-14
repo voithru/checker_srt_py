@@ -136,6 +136,16 @@ class SettingsManager:
                     "VIE": False,
                     "IND": False,
                     "THA": False
+                 }},
+                 {"name": "첫번째 자막", "languages": {
+                    "KOR": True,
+                    "ENG": True,
+                    "JPN": True,
+                    "CHN": False,
+                    "SPA": False,
+                    "VIE": False,
+                    "IND": False,
+                    "THA": False
                  }}
             ]
         }
